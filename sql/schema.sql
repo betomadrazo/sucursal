@@ -1,3 +1,7 @@
+DROP TABLE canciones_local;
+DROP TABLE colecciones_local;
+DROP TABLE canciones_coleccionadas_local;
+
 CREATE DATABASE IF NOT EXISTS rocola;
 
 USE rocola;
