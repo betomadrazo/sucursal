@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS canciones_local (
     artista VARCHAR (200),
     album VARCHAR (200),
     coleccion_id INT UNSIGNED,
+    last_played TIME,
     FOREIGN KEY (coleccion_id) REFERENCES colecciones(id) ON DELETE CASCADE
 );
 

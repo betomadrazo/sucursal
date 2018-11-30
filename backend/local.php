@@ -48,33 +48,21 @@ if(isset($_GET['accion']) && $_GET['accion'] === 'get_random_song') {
 function updateLocalDB() {
 	global $conn, $url;
 
-	// echo $url;
-	// $url = 'http://www.betomad.com/rocola/consola/controllers/controller_musica.php';
-
 	// Envía el GET request con curl
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url.'?accion=get_db');
-	// curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	// curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 	$result = curl_exec($ch);
 
-	// echo "#: ";
-	//print_r($result);
-
-
-	// $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 	curl_close($ch);
 
 
 	// Obtiene la base de datos en formato json
   	$db = json_decode($result, true);
 
-  	// echo "# ";
   	print_r($db);
-  	// echo "# ";
 
   	// Ahora va a guardar la base en el servidor local
 	mysqli_autocommit($conn, FALSE);
