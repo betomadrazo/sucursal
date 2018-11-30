@@ -8,7 +8,7 @@ var sucursalId = sucursal;
 
 console.log(sucursalId);
 
-const DEBUG = false;
+const DEBUG = true;
 
 var cola = [];
 
@@ -153,8 +153,6 @@ function playSong(cancion, id) {
 	
 	removeSongFromQueue(id);
 
-	playedAt(id);
-
 	audio.onloadedmetadata = function() {
 		var duracion = Math.floor(audio.duration);
 		var timero = document.getElementById('tiempo-restante');
@@ -225,6 +223,7 @@ function playedAt(cancionId) {
 		data: {
 			accion: 'update_last_played',
 			cancion_id: cancionId,
+			sucursal_id: sucursalId
 		},
 		success: function(re) {
 			console.log(re);
@@ -301,9 +300,11 @@ function actualizaCatalogo() {
 // La canción termina
 audio.addEventListener('ended',function() {
 
-	/////////////////////// EXPERIMENTO ///////////////////////
+	console.log("COLEEEERAAA ", cola);
+	// Envía la hora en que se tocó
+	playedAt(cola[0].id);
+
 	checkQueueStatus();
-	///////////////////////////////////////////////////////////
 	clearInterval(tiempoRestante);
 	// si hay elementos en cola
 	if(cola.length) {

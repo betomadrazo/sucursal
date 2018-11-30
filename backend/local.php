@@ -30,8 +30,9 @@ if(isset($_POST['accion']) && $_POST['accion'] === 'update_colecciones_local') {
 	echo json_encode(updateColeccionesLocal($_POST['colecciones'], $_POST['canciones_coleccionadas']));
 }
 
+
 if(isset($_POST['accion']) && $_POST['accion'] === 'update_last_played') {
-	playedAt((int)$_POST['cancion_id']);
+	playedAt((int)$_POST['cancion_id'], (int)$_POST['sucursal_id']);
 }
 
 
@@ -84,7 +85,7 @@ function updateLocalDB() {
 		if(mysqli_query($conn, $q)) {
 			echo "si señor\n";
 		} else {
-			echo "VALES VERGA, PENDEJO\n";
+			echo "DAMN!\n";
 		}
 	}
 
@@ -93,14 +94,11 @@ function updateLocalDB() {
 	// Actualiza las colecciones
 	$ch = curl_init();
 	curl_setopt($ch, CURLOPT_URL, $url.'?accion=get_colecciones_para_sucursales');
-	// curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	// curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 	$result = curl_exec($ch);
 
-	// $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 	curl_close($ch);
 
 	// Obtiene la base de datos en formato json
@@ -212,7 +210,6 @@ function getRandomSong() {
 		$canciones = array();
 		if(mysqli_num_rows($res)) {
 			while($row = mysqli_fetch_assoc($res)) {
-				// $cancion = $row['id'];
 				array_push($canciones, (int) $row['id']);
 			}
 			return json_encode($canciones);
@@ -228,12 +225,48 @@ function getHora() {
 	return $date->format("H:i");
 }
 
-function playedAt($song_id) {
+function playedAt($song_id, $sucursal_id) {
 	global $conn;
 
 	$q = "UPDATE canciones_local SET last_played=CURTIME() WHERE id={$song_id} LIMIT 1";
-
 	mysqli_query($conn, $q);
+
+	postCancionesDesactivadasEnSucursal($sucursal_id);
+}
+
+function postCancionesDesactivadasEnSucursal($sucursal_id) {
+	global $conn, $url;
+
+	$canciones = array(
+		'accion'=>'post_canciones_desactivadas_en_sucursal',
+		'id_sucursal'=> $sucursal_id,
+		'ids_canciones'=> array()
+	);
+
+	// Obtener los ids de las canciones que tengan menos de 3 horas de ser tocadas
+	$q = "SELECT id from canciones_local WHERE TIMEDIFF(CURTIME(), last_played) < '3:00:00'";
+	$res = mysqli_query($conn, $q);
+
+	if($res) {
+		while($row = mysqli_fetch_assoc($res)) {
+			array_push($canciones['ids_canciones'], $row['id']);
+		}
+	}
+
+	$songs = http_build_query($canciones);
+
+	$ch = curl_init();
+	
+	curl_setopt($ch, CURLOPT_URL, $url);
+	curl_setopt($ch, CURLOPT_POST, 1);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $songs);
+	
+	// Receive server response
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	
+	$server_output = curl_exec($ch);
+
+	curl_close ($ch);
 }
 
 
