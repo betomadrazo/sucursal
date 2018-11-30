@@ -13,7 +13,7 @@ $protocolo = 'http://';
 
 $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database) or die("no se pudo conectar.");
 
-$DEBUG = false;
+$DEBUG = true;
 
 $web_server = 'www.betomad.com';
 $server = ($DEBUG) ? $_SERVER['SERVER_NAME'] : $web_server;
@@ -28,6 +28,10 @@ if(isset($_GET['accion']) && $_GET['accion'] === 'update_db') {
 
 if(isset($_POST['accion']) && $_POST['accion'] === 'update_colecciones_local') {
 	echo json_encode(updateColeccionesLocal($_POST['colecciones'], $_POST['canciones_coleccionadas']));
+}
+
+if(isset($_POST['accion']) && $_POST['accion'] === 'update_last_played') {
+	playedAt((int)$_POST['cancion_id']);
 }
 
 
@@ -167,6 +171,10 @@ function getSongsInQueue($data) {
 function getRandomSong() {
 	global $conn;
 	$hora = getHora();
+	$hora_pedida = date("H:i", strtotime("-1 hour America/Mexico_City"));
+
+	// La diferencia de horas que deben pasar para que la canción pueda ser tocada nuevamente
+	$clausula_horas = "(TIMEDIFF(CURTIME(), last_played) >= '3:00:00' OR last_played IS NULL)";
 
 	// Obtiene las id de las colecciones activas
 	$activas_q = "SELECT id FROM colecciones_local WHERE activa=1 AND ((CURTIME() >= hora_inicio AND CURTIME() <= hora_fin) OR hora_inicio = hora_fin)";
@@ -179,6 +187,8 @@ function getRandomSong() {
 			while($row = mysqli_fetch_assoc($res)) {
 				array_push($canciones, $row['id']);
 			}
+
+			// TODO: Si ya no hay canciones para tocar(cosa improbable) se queda sin poder tocar nada. Hacer que toque algo.
 	
 			$canciones_coleccionadas_q = "SELECT cancion_id FROM canciones_coleccionadas_local WHERE coleccion_id IN(".implode(",", $canciones).")";
 			$res = mysqli_query($conn, $canciones_coleccionadas_q);
@@ -188,13 +198,14 @@ function getRandomSong() {
 				array_push($ids_canciones, $row['cancion_id']);
 			}
 	
-			$q =  "SELECT id FROM canciones_local WHERE id IN(".implode(',', $ids_canciones).") ORDER BY RAND() LIMIT 1";
+			$q =  "SELECT id FROM canciones_local WHERE id IN(".implode(',', $ids_canciones).") AND ".$clausula_horas." ORDER BY RAND() LIMIT 1";
+
 			$res = mysqli_query($conn, $q);
 	
 		// No hay colecciones activas, tomar una canción de la colección entera.
 		} else {
 	
-			$q =  "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
+			$q =  "SELECT id FROM canciones_local WHERE ".$clausula_horas." ORDER BY RAND() LIMIT 1";
 			$res = mysqli_query($conn, $q);
 		}
 	
@@ -215,6 +226,14 @@ function getRandomSong() {
 function getHora() {
 	$date = new DateTime("now", new DateTimeZone('America/Mexico_City'));
 	return $date->format("H:i");
+}
+
+function playedAt($song_id) {
+	global $conn;
+
+	$q = "UPDATE canciones_local SET last_played=CURTIME() WHERE id={$song_id} LIMIT 1";
+
+	mysqli_query($conn, $q);
 }
 
 

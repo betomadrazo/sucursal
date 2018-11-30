@@ -151,7 +151,9 @@ function playSong(cancion, id) {
 		audio.play();
 	}, 150);
 	
-	removeSongFromQueue(id); 
+	removeSongFromQueue(id);
+
+	playedAt(id);
 
 	audio.onloadedmetadata = function() {
 		var duracion = Math.floor(audio.duration);
@@ -210,6 +212,26 @@ function postSongStatus(cancionId, titulo, artista, tiempo) {
 				tiempo_transcurrido: tiempo.currentTime
 			}
 		},
+	});
+}
+
+
+function playedAt(cancionId) {
+	$.ajax({
+		url: url_local,
+		type: 'POST',
+		dataType: 'json',
+		crossDomain: true,
+		data: {
+			accion: 'update_last_played',
+			cancion_id: cancionId,
+		},
+		success: function(re) {
+			console.log(re);
+		},
+		error: function(a, b) {
+			console.log(a, b);
+		}
 	});
 }
 
