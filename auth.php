@@ -1,53 +1,3 @@
-<?php
-session_start();
-
-include './secrets.php';
-
-$conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database);
-
-
-if(isset($_POST['usuario']) && isset($_POST['password'])) {
-	$usuario = $_POST['usuario'];
-	$password = $_POST['password'];
-
-	if(authSucursal($usuario, $password)) {
-		$_SESSION['usuario'] = $usuario;
-		if(isset($_GET['sitio'])) {
-			header("Location: ".htmlspecialchars($_GET['sitio']));
-		} else {
-			header("Location: index.php");
-		}
-	} else {
-		$_SESSION['mensaje'] = "Usuario o contraseña incorrectos.";
-		header("Location: auth.php");
-	}
-}
-
-
-function authSucursal($usuario, $password) {
-	global $conn;
-
-	// obtener usuario
-	$usuario_q = "SELECT * FROM usuarios WHERE usuario=\"{$usuario}\" LIMIT 1";
-	$res = mysqli_query($conn, $usuario_q);
-
-	if($res) {
-		if(mysqli_num_rows($res)) {
-			$crypt = mysqli_fetch_assoc($res)['pwd'];
-			echo $password." vs ". $crypt;
-			// comprobar la contraseña contra el hash que está en la base de datos
-			if(password_verify($password, $crypt)) {
-				return true;
-			}
-		}
-	}
-
-
-	return false;
-}
-
-
-?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -114,7 +64,7 @@ function authSucursal($usuario, $password) {
 	
 		<div class="auth-form">
 			<h2>Ingresa</h2>
-			<p style="color:red;"><?php if(isset($_SESSION['mensaje'])) echo $_SESSION['mensaje']; ?></p>
+			<p class="msg_fail" style="color:red; display:none;">Usuario o contraseña incorrectos.</p>
 			<form id="formulario_auth" action="" method="post">
 				<input type="hidden" name="accion" value="auth_sucursal">
 				<input name="usuario" type="text" placeholder="usuario">

@@ -1,16 +1,67 @@
 $(function() {
 
+
+
+
 var sucursal = $('#sucursal_id').val();
 
 console.log(sucursal);
 
 var sucursalId = sucursal;
 
-var TIPO_SUCURSAL = 'restaurante';
+var nombreSucursal;
 
+// alert(sucursalId);
+switch(parseInt(sucursalId)) {
+	case 10:
+	nombreSucursal = 'Corporativo';
+	TIPO_SUCURSAL = 'restaurante';
+	break;
+	case 11:
+	nombreSucursal = 'Condesa';
+	TIPO_SUCURSAL = 'restaurante';
+	break;
+	case 12:
+	nombreSucursal = 'Polanco';
+	TIPO_SUCURSAL = 'restaurante';
+	break;
+	case 13:
+	nombreSucursal = 'Santa Fé';
+	TIPO_SUCURSAL = 'restaurante';
+	break;
+	case 14:
+	nombreSucursal = 'Perisur';
+	TIPO_SUCURSAL = 'restaurante';
+	break;
+	case 15:
+	nombreSucursal = 'Zona Rosa';
+	TIPO_SUCURSAL = 'restaurante';
+	break;
+	case 16:
+	nombreSucursal = 'Roma';
+	TIPO_SUCURSAL = 'restaurante';
+	break;
+	case 17:
+	nombreSucursal = 'San Ángel';
+	TIPO_SUCURSAL = 'restaurante';
+	break;
+	case 20:
+	nombreSucursal = 'Bar Bukowski';
+	TIPO_SUCURSAL = 'bar';
+	break;
+	case 21:
+	nombreSucursal = 'Bar Roma';
+	TIPO_SUCURSAL = 'bar';
+	break;
+}
+
+$('.nombre_sucursal').html(nombreSucursal).css({'display':'inline-block', 'margin':'0', 'float': 'left'});
+
+window.history.pushState({}, document.title, "/sucursal/index.php");
 console.log(sucursalId);
+console.log(TIPO_SUCURSAL);
 
-const DEBUG = true;
+const DEBUG = false;
 
 var cola = [];
 

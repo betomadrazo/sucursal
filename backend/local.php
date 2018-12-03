@@ -13,7 +13,7 @@ $protocolo = 'http://';
 
 $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database) or die("no se pudo conectar.");
 
-$DEBUG = true;
+$DEBUG = false;
 
 // $web_server = 'www.betomad.com';
 $web_server = 'rockola.pendulo.com.mx';
@@ -198,16 +198,18 @@ function getRandomSong() {
 
 			$res = mysqli_query($conn, $q);
 
-
-			if(!mysqli_num_rows($res)) {
-				$q =  "SELECT id FROM canciones_local WHERE ".$clausula_horas." ORDER BY RAND() LIMIT 1";
-				$res = mysqli_query($conn, $q);
-
+			if($res) {
 				if(!mysqli_num_rows($res)) {
-					$q =  "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
+					$q =  "SELECT id FROM canciones_local WHERE ".$clausula_horas." ORDER BY RAND() LIMIT 1";
 					$res = mysqli_query($conn, $q);
+	
+					if(!mysqli_num_rows($res)) {
+						$q =  "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
+						$res = mysqli_query($conn, $q);
+					}
 				}
 			}
+
 	
 		// No hay colecciones activas, tomar una canción de la colección entera.
 		} else {

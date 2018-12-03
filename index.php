@@ -4,9 +4,10 @@ session_start();
 
 if(isset($_GET['usuario'])) {
     $_SESSION['usuario'] = $_GET['usuario'];
+    $_SESSION['sucursal_id'] = $_GET['sucursal_id'];
 }
 
-$DEBUG = true;
+$DEBUG = false;
 
 
 if(!isset($_SESSION['usuario'])) {
@@ -30,12 +31,19 @@ if(!isset($_SESSION['usuario'])) {
 </head>
 <body>
 
-<input type="hidden" id="sucursal_id" value="<?php if(isset($_GET['sucursal_id'])) echo $_GET['sucursal_id']; else echo ''; ?>">
+<input type="hidden" id="sucursal_id" value="<?php if(isset($_SESSION['sucursal_id'])) echo $_SESSION['sucursal_id']; else echo ''; ?>">
 
 <div class="fondo">
     <div class="conti">
         <div class="cont-acciones">
+            <h3 class="nombre_sucursal"></h3>
             <button class="voton" id="actualiza-catalogo">Actualizar cat&aacute;logo</button>
+
+            <a href="logout.php" style="text-decoration: none; display:inline-block; margin-left:20px; vertical-align:bottom;">
+                <span style="display:block; font-size:10px;"><?php if(isset($_SESSION['usuario'])) echo $_SESSION['usuario']; ?></span>
+                <span style="display:block;">Salir</span>
+            </a>
+
         </div>
     
         <div class="cancion_row">
