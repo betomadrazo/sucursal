@@ -15,14 +15,15 @@ $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $da
 
 $DEBUG = true;
 
-$web_server = 'www.betomad.com';
+// $web_server = 'www.betomad.com';
+$web_server = 'rockola.pendulo.com.mx';
 $server = ($DEBUG) ? $_SERVER['SERVER_NAME'] : $web_server;
 
 $url = $protocolo.$server.'/rocola/consola/controllers/controller_musica.php';
 
 
 if(isset($_GET['accion']) && $_GET['accion'] === 'update_db') {
-	echo json_encode(updateLocalDB());
+	echo json_encode(updateLocalDB($_GET['tipo_sucursal']));
 }
 
 
@@ -50,7 +51,7 @@ if(isset($_GET['accion']) && $_GET['accion'] === 'get_random_song') {
 }
 
 
-function updateLocalDB() {
+function updateLocalDB($tipo_sucursal) {
 	global $conn, $url;
 
 	// Envía el GET request con curl
@@ -93,9 +94,8 @@ function updateLocalDB() {
 
 	// Actualiza las colecciones
 	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url.'?accion=get_colecciones_para_sucursales');
+	curl_setopt($ch, CURLOPT_URL, $url."?accion=get_colecciones_para_sucursales&tipo_sucursal={$tipo_sucursal}");
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 	$result = curl_exec($ch);
 
@@ -185,8 +185,6 @@ function getRandomSong() {
 			while($row = mysqli_fetch_assoc($res)) {
 				array_push($canciones, $row['id']);
 			}
-
-			// TODO: Si ya no hay canciones para tocar(cosa improbable) se queda sin poder tocar nada. Hacer que toque algo.
 	
 			$canciones_coleccionadas_q = "SELECT cancion_id FROM canciones_coleccionadas_local WHERE coleccion_id IN(".implode(",", $canciones).")";
 			$res = mysqli_query($conn, $canciones_coleccionadas_q);
@@ -199,11 +197,23 @@ function getRandomSong() {
 			$q =  "SELECT id FROM canciones_local WHERE id IN(".implode(',', $ids_canciones).") AND ".$clausula_horas." ORDER BY RAND() LIMIT 1";
 
 			$res = mysqli_query($conn, $q);
+
+
+			if(!mysqli_num_rows($res)) {
+				$q =  "SELECT id FROM canciones_local WHERE ".$clausula_horas." ORDER BY RAND() LIMIT 1";
+				$res = mysqli_query($conn, $q);
+
+				if(!mysqli_num_rows($res)) {
+					$q =  "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
+					$res = mysqli_query($conn, $q);
+				}
+			}
 	
 		// No hay colecciones activas, tomar una canción de la colección entera.
 		} else {
 	
-			$q =  "SELECT id FROM canciones_local WHERE ".$clausula_horas." ORDER BY RAND() LIMIT 1";
+			// $q =  "SELECT id FROM canciones_local WHERE ".$clausula_horas." ORDER BY RAND() LIMIT 1";
+			$q =  "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
 			$res = mysqli_query($conn, $q);
 		}
 	

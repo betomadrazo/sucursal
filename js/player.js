@@ -6,6 +6,8 @@ console.log(sucursal);
 
 var sucursalId = sucursal;
 
+var TIPO_SUCURSAL = 'restaurante';
+
 console.log(sucursalId);
 
 const DEBUG = true;
@@ -21,7 +23,8 @@ var songIndex = 0;
 var tiempoRestante;
 
 var url = (DEBUG) ? '/rocola/consola/controllers/controller_musica.php' 
-				  				: 'http://www.betomad.com/rocola/consola/controllers/controller_musica.php';
+				  				: 'http://rockola.pendulo.com.mx/rocola/consola/controllers/controller_musica.php';
+				  				// : 'http://www.betomad.com/rocola/consola/controllers/controller_musica.php';
 
 var url_local = 'backend/local.php';
 
@@ -286,6 +289,7 @@ function actualizaCatalogo() {
 		// crossDomain: true,
 		data: {
 			accion: 'update_db',
+			tipo_sucursal: TIPO_SUCURSAL
 		},
 		success: function(response) {
 			// alert(response.msg);

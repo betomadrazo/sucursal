@@ -9,7 +9,8 @@ $(function() {
 		var formulario = $(this).serialize();
 		
 		$.ajax({
-			url: 'http://www.betomad.com/rocola/consola/controllers/controller_musica.php',
+			// url: 'http://www.betomad.com/rocola/consola/controllers/controller_musica.php',
+			url: 'http://rockola.pendulo.com.mx/rocola/consola/controllers/controller_musica.php',
 			type: 'POST',
 			dataType: 'json',
 			crossDomain: true,
