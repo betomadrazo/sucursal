@@ -1,11 +1,7 @@
 $(function() {
 
 
-
-
 var sucursal = $('#sucursal_id').val();
-
-console.log(sucursal);
 
 var sucursalId = sucursal;
 
@@ -343,7 +339,7 @@ function actualizaCatalogo() {
 			tipo_sucursal: TIPO_SUCURSAL
 		},
 		success: function(response) {
-			// alert(response.msg);
+			window.location.reload(false);
 		},
 		error: function(error, dd) {
 			console.log(error, dd);
@@ -355,7 +351,6 @@ function actualizaCatalogo() {
 // La canción termina
 audio.addEventListener('ended',function() {
 
-	console.log("COLEEEERAAA ", cola);
 	// Envía la hora en que se tocó
 	playedAt(cola[0].id);
 

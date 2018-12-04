@@ -64,11 +64,10 @@ function updateLocalDB($tipo_sucursal) {
 
 	curl_close($ch);
 
-
 	// Obtiene la base de datos en formato json
   	$db = json_decode($result, true);
 
-  	print_r($db);
+  	// print_r($db);
 
   	// Ahora va a guardar la base en el servidor local
 	mysqli_autocommit($conn, FALSE);
@@ -82,12 +81,12 @@ function updateLocalDB($tipo_sucursal) {
 			  VALUES({$d['id']}, \"{$d['titulo']}\", \"{$d['duracion']}\", \"{$d['artista']}\", \"{$d['album']}\", \"{$d['song_path']}\")";
 		mysqli_query($conn, $q) or die(mysqli_error($conn));
 
-		echo $q."\n";
-		if(mysqli_query($conn, $q)) {
-			echo "si señor\n";
-		} else {
-			echo "DAMN!\n";
-		}
+		// echo $q."\n";
+		// if(mysqli_query($conn, $q)) {
+		// 	echo "si señor\n";
+		// } else {
+		// 	echo "DAMN!\n";
+		// }
 	}
 
 	mysqli_commit($conn);
