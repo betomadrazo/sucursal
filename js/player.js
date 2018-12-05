@@ -70,7 +70,7 @@ var songIndex = 0;
 var tiempoRestante;
 
 var url = (DEBUG) ? '/rocola/consola/controllers/controller_musica.php' 
-				  				: 'http://rockola.pendulo.com.mx/rocola/consola/controllers/controller_musica.php';
+				  				: 'http://rocola.pendulo.com.mx/rocola/consola/controllers/controller_musica.php';
 				  				// : 'http://www.betomad.com/rocola/consola/controllers/controller_musica.php';
 
 var url_local = 'backend/local.php';
@@ -182,12 +182,6 @@ function removeSongFromQueue(songId) {
 			accion: 'remove_from_queue',
 			sucursal_id: sucursalId,
 			song_id: songId
-		},
-		success: function(response) {
-			console.log("borrada: ", response);
-		},
-		error: function(response, erre) {
-			console.log(response, erre); ///// CAMBIO
 		}
 	});
 }
@@ -274,12 +268,6 @@ function playedAt(cancionId) {
 			accion: 'update_last_played',
 			cancion_id: cancionId,
 			sucursal_id: sucursalId
-		},
-		success: function(re) {
-			console.log(re);
-		},
-		error: function(a, b) {
-			console.log(a, b);
 		}
 	});
 }

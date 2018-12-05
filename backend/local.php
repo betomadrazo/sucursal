@@ -16,7 +16,7 @@ $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $da
 $DEBUG = false;
 
 // $web_server = 'www.betomad.com';
-$web_server = 'rockola.pendulo.com.mx';
+$web_server = 'rocola.pendulo.com.mx';
 $server = ($DEBUG) ? $_SERVER['SERVER_NAME'] : $web_server;
 
 $url = $protocolo.$server.'/rocola/consola/controllers/controller_musica.php';
