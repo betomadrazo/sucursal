@@ -4,7 +4,6 @@ session_start();
 
 if(isset($_GET['usuario'])) {
     $_SESSION['usuario'] = $_GET['usuario'];
-    $_SESSION['sucursal_id'] = $_GET['sucursal_id'];
 }
 
 $DEBUG = false;

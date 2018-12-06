@@ -16,7 +16,7 @@ $(function() {
 			success: function(response) {
 				console.log(response);
 				if(response.auth) {
-					window.location.replace(`/sucursal/index.php?usuario=${response.usuario}&sucursal_id=${response.sucursal_id}`);
+					window.location.replace(`/sucursal/index.php?usuario=${response.usuario}`);
 				} else $('.msg_fail').css({'display':'block'});
 			},
 			error: function(error, dd) {
