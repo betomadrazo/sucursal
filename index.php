@@ -66,10 +66,9 @@ if(!isset($_SESSION['usuario'])) {
     
 </body>
 
-<script src="js/jquery.js">
-    
-</script>
+<script src="js/jquery.js"></script>
 
+<script src="js/sucursal.js"></script>
 <script src="js/player.js"></script>
 
 </html>
