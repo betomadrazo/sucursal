@@ -6,7 +6,7 @@ if(isset($_GET['usuario'])) {
     $_SESSION['usuario'] = $_GET['usuario'];
 }
 
-$DEBUG = false;
+$DEBUG = true;
 
 
 if(!isset($_SESSION['usuario'])) {

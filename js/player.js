@@ -1,5 +1,7 @@
 $(function() {
 
+const DEBUG = true;
+
 var nombreSucursal;
 
 // alert(sucursalId);
@@ -41,7 +43,6 @@ $('.nombre_sucursal').html(nombreSucursal).css({'display':'inline-block', 'margi
 window.history.pushState({}, document.title, "/sucursal/index.php");
 console.log(sucursalId);
 
-const DEBUG = false;
 
 var cola = [];
 

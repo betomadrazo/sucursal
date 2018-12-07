@@ -13,7 +13,7 @@ $protocolo = 'http://';
 
 $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database) or die("no se pudo conectar.");
 
-$DEBUG = false;
+$DEBUG = true;
 
 // $web_server = 'www.betomad.com';
 $web_server = 'rocola.pendulo.com.mx';
@@ -23,7 +23,7 @@ $url = $protocolo.$server.'/rocola/consola/controllers/controller_musica.php';
 
 
 if(isset($_GET['accion']) && $_GET['accion'] === 'update_db') {
-	echo json_encode(updateLocalDB($_GET['tipo_sucursal']));
+	echo json_encode(updateLocalDB());
 }
 
 
@@ -51,7 +51,7 @@ if(isset($_GET['accion']) && $_GET['accion'] === 'get_random_song') {
 }
 
 
-function updateLocalDB($tipo_sucursal) {
+function updateLocalDB() {
 	global $conn, $url;
 
 	// Envía el GET request con curl
@@ -93,7 +93,7 @@ function updateLocalDB($tipo_sucursal) {
 
 	// Actualiza las colecciones
 	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url."?accion=get_colecciones_para_sucursales&tipo_sucursal={$tipo_sucursal}");
+	curl_setopt($ch, CURLOPT_URL, $url."?accion=get_colecciones_para_sucursales");
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
 	$result = curl_exec($ch);
