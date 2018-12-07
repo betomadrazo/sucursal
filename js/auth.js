@@ -1,4 +1,8 @@
 
+var url = (DEBUG) ? '/rocola/consola/controllers/controller_musica.php' 
+				  				: 'http://rocola.pendulo.com.mx/rocola/consola/controllers/controller_musica.php';
+				  				// : 'http://www.betomad.com/rocola/consola/controllers/controller_musica.php';
+
 $(function() {
 
 	$('#formulario_auth').submit(function(event) {
@@ -8,7 +12,7 @@ $(function() {
 		
 		$.ajax({
 			// url: 'http://www.betomad.com/rocola/consola/controllers/controller_musica.php',
-			url: 'http://rocola.pendulo.com.mx/rocola/consola/controllers/controller_musica.php',
+			url: url,
 			type: 'POST',
 			dataType: 'json',
 			crossDomain: true,

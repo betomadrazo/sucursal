@@ -1,6 +1,6 @@
+
 $(function() {
 
-const DEBUG = true;
 
 var nombreSucursal;
 
