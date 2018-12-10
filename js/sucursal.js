@@ -9,10 +9,10 @@
 // San Ángel:  17
 
 
-var sucursalId =20;
+var sucursalId = 20;
 
 
 
 
 
-var DEBUG = true;
+var DEBUG = false;

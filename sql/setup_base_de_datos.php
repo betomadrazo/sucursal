@@ -19,7 +19,6 @@ mysqli_query($conn,
     	duracion VARCHAR(8),
     	song_path VARCHAR (200),
     	artista VARCHAR (200),
-    	album VARCHAR (200),
     	coleccion_id INT UNSIGNED
 	)"
 );

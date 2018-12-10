@@ -33,9 +33,6 @@ switch(parseInt(sucursalId)) {
 	case 20:
 	nombreSucursal = 'PRUEBAS';
 	break;
-	case 21:
-	nombreSucursal = 'Bar Roma';
-	break;
 }
 
 $('.nombre_sucursal').html(nombreSucursal).css({'display':'inline-block', 'margin':'0', 'float': 'left'});
@@ -50,7 +47,8 @@ var audio = document.getElementById('plyr');
 audio.volume = 0.5;
 audio.autoplay = false;
 
-var songIndex = 0;
+var idCurrentSong = 0;
+
 
 var tiempoRestante;
 
@@ -77,13 +75,24 @@ function getQueue() {
 				sucursal_id: sucursalId
 		},
 		success: function(queue) {
+
+			console.log("quiú", queue);
+
+
 			if(queue.length) {
+				if(queue[0] === idCurrentSong) {
+					queue.shift();
+				}
 				getSongsInQueue(queue);
 			} else {
 				playRandomSong();
 			}
 		},
-		error: function(e, a) { console.log(e, a)}
+		error: function(e, a) { 
+			console.log("vale verga", e, a)
+
+			playRandomSong();
+		}
 	});
 }
 
@@ -173,6 +182,9 @@ function removeSongFromQueue(songId) {
 
 
 function playSong(cancion, id) {
+
+	idCurrentSong = id;
+
 	var segundosParaRefrescarStatus = 3;
 	audio.src = cancion.path;
 	audio.load();
@@ -311,7 +323,7 @@ function actualizaCatalogo() {
 			accion: 'update_db'
 		},
 		success: function(response) {
-			window.location.reload(false);
+			// window.location.reload(false);
 		},
 		error: function(error, dd) {
 			console.log(error, dd);
@@ -322,6 +334,8 @@ function actualizaCatalogo() {
 
 // La canción termina
 audio.addEventListener('ended',function() {
+
+	console.log(idCurrentSong);
 
 	// Envía la hora en que se tocó
 	playedAt(cola[0].id);
