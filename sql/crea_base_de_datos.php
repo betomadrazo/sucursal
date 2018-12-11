@@ -8,11 +8,13 @@ $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $da
 if(isset($_POST['recrear'])) {
 	
 	mysqli_autocommit($conn, FALSE);
+
+	mysqli_query($conn, "CREATE DATABASE IF NOT EXISTS rocola");
+	mysqli_query($conn, "USE rocola");
 	
 	mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 0");
 	
 	mysqli_query($conn, "DROP TABLE canciones_local");
-	mysqli_query($conn, "DROP TABLE colecciones_local");
 	mysqli_query($conn, "DROP TABLE colecciones_local");
 	mysqli_query($conn, "DROP TABLE canciones_coleccionadas_local");
 	
