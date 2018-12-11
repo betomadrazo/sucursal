@@ -13,7 +13,6 @@ if(!isset($_SESSION['usuario'])) {
     header("Location: /sucursal/auth.php?sitio=".urlencode("http://localhost/sucursal/index.php")); //urlencode($_SERVER['REQUEST_URI']));
 }
 
-
 ?>
 
 <!DOCTYPE html>
@@ -58,6 +57,14 @@ if(!isset($_SESSION['usuario'])) {
     
         <div class="contenedor-cola">
             <ul id="cola"></ul>
+        </div>
+    </div>
+</div>
+
+<div class="actualizando">
+    <div class="actualizando_cont">
+        <div class="actualizando_mensaje">
+            Se est&aacute; actualizando el cat&aacute;logo
         </div>
     </div>
 </div>

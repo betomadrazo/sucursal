@@ -314,6 +314,7 @@ $('#actualiza-catalogo').on('click', function() {
 
 
 function actualizaCatalogo() {
+	$('.actualizando').css({'display': 'block'});
 	$.ajax({
 		url: url_local,
 		type: 'GET',
@@ -323,10 +324,12 @@ function actualizaCatalogo() {
 			accion: 'update_db'
 		},
 		success: function(response) {
-			// window.location.reload(false);
+			window.location.reload(false);
 		},
 		error: function(error, dd) {
 			console.log(error, dd);
+			$('.actualizando').css({'display': 'none'});
+			alert("Error al actualizar");
 		}
 	});
 }
