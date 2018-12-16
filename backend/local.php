@@ -13,7 +13,7 @@ $protocolo = 'http://';
 
 $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database) or die("no se pudo conectar.");
 
-$DEBUG = false;
+$DEBUG = true;
 
 // $web_server = 'www.betomad.com';
 $web_server = 'rocola.pendulo.com.mx';
@@ -163,9 +163,12 @@ function getRandomSong() {
 	$hora_pedida = date("H:i", strtotime("-1 hour America/Mexico_City"));
 
 	// La diferencia de horas que deben pasar para que la canción pueda ser tocada nuevamente
-	$clausula_horas = "(TIMEDIFF(CURTIME(), last_played) >= '3:00:00' OR last_played IS NULL)";
+	// $clausula_horas = "(TIMEDIFF(CURTIME(), last_played) >= '3:00:00' OR last_played IS NULL)";
+	// $clausula_horas = "SUBDATE(NOW(), INTERVAL 3 HOUR) >= last_played";
+	$clausula_horas = "TIMEDIFF(NOW(), last_played) >= '01:00:00'";
 
 	// Obtiene las id de las colecciones activas
+	// $activas_q = "SELECT id FROM colecciones_local WHERE activa=1 AND ((CURTIME() >= hora_inicio AND CURTIME() <= hora_fin) OR hora_inicio = hora_fin)";
 	$activas_q = "SELECT id FROM colecciones_local WHERE activa=1 AND ((CURTIME() >= hora_inicio AND CURTIME() <= hora_fin) OR hora_inicio = hora_fin)";
 	$res = mysqli_query($conn, $activas_q);
 
@@ -187,6 +190,8 @@ function getRandomSong() {
 		}
 	
 		$q =  "SELECT id FROM canciones_local WHERE id IN(".implode(',', $ids_canciones).") AND ".$clausula_horas." ORDER BY RAND() LIMIT 1";
+
+		// echo $q;
 
 		$res = mysqli_query($conn, $q);
 
@@ -244,7 +249,7 @@ function getHora() {
 function playedAt($song_id, $sucursal_id) {
 	global $conn;
 
-	$q = "UPDATE canciones_local SET last_played=CURTIME() WHERE id={$song_id} LIMIT 1";
+	$q = "UPDATE canciones_local SET last_played=NOW() WHERE id={$song_id} LIMIT 1";
 	mysqli_query($conn, $q);
 
 	postCancionesDesactivadasEnSucursal($sucursal_id);
@@ -260,7 +265,7 @@ function postCancionesDesactivadasEnSucursal($sucursal_id) {
 	);
 
 	// Obtener los ids de las canciones que tengan menos de 3 horas de ser tocadas
-	$q = "SELECT id from canciones_local WHERE TIMEDIFF(CURTIME(), last_played) < '3:00:00'";
+	$q = "SELECT id from canciones_local WHERE TIMEDIFF(NOW(), last_played) < '3:00:00'";
 	$res = mysqli_query($conn, $q);
 
 	if($res) {

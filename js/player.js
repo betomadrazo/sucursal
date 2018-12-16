@@ -282,6 +282,7 @@ function Song(info, index) {
 
 
 function checkQueueStatus() {
+	console.log("here");
 	$.ajax({
 		url: url,
 		type: 'POST',

@@ -28,7 +28,7 @@ if(isset($_POST['recrear'])) {
 	    artista VARCHAR (200),
 	    album VARCHAR (200),
 	    coleccion_id INT UNSIGNED,
-	    last_played TIME,
+	    last_played TIMESTAMP NULL DEFAULT NULL,
 	    FOREIGN KEY (coleccion_id) REFERENCES colecciones(id) ON DELETE CASCADE
 	)"
 	);
