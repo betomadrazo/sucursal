@@ -15,4 +15,4 @@ var sucursalId = 20;
 
 
 
-var DEBUG = true;
+var DEBUG = false;
