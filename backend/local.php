@@ -13,7 +13,7 @@ $protocolo = 'http://';
 
 $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database) or die("no se pudo conectar.");
 
-$DEBUG = false;
+$DEBUG = true;
 
 // $web_server = 'www.betomad.com';
 $web_server = 'rocola.pendulo.com.mx';
@@ -104,8 +104,20 @@ function updateColeccionesLocal($colecciones, $canciones_coleccionadas) {
 	global $conn;
 
 	mysqli_autocommit($conn, FALSE);
+	// mysqli_query($conn, "TRUNCATE TABLE canciones_coleccionadas_local");
+	mysqli_query($conn, "DROP TABLE IF EXISTS canciones_coleccionadas_local");
+
+	mysqli_query($conn,
+	"CREATE TABLE IF NOT EXISTS canciones_coleccionadas_local (
+	    coleccion_id INT UNSIGNED,
+	    cancion_id INT UNSIGNED,
+	    FOREIGN KEY (coleccion_id) REFERENCES colecciones_local(id) ON DELETE CASCADE,
+	    FOREIGN KEY (cancion_id) REFERENCES canciones_local(id) ON DELETE CASCADE,
+	    PRIMARY KEY(coleccion_id, cancion_id)
+	)"
+	);
+
 	mysqli_query($conn, "TRUNCATE TABLE colecciones_local");
-	mysqli_query($conn, "TRUNCATE TABLE canciones_coleccionadas_local");
 
 	foreach($colecciones as $c) {
 		$q = "INSERT INTO colecciones_local(id, hora_inicio, hora_fin, activa) 
