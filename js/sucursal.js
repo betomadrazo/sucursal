@@ -4,9 +4,9 @@
 // Polanco: 	 12
 // Santa Fé: 	 13
 // Perisur: 	 14
-// Zona Rosa:  15
-// Roma: 			 16
-// San Ángel:  17
+// Zona Rosa:    15
+// Roma: 	     16
+// San Ángel:    17
 
 
 var sucursalId = 20;
@@ -15,4 +15,4 @@ var sucursalId = 20;
 
 
 
-var DEBUG = true;
+var DEBUG = false;
