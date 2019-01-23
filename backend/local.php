@@ -1,6 +1,5 @@
 <?php
 
-
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
 header('content-type: application/json; charset=utf-8');
@@ -17,6 +16,7 @@ $DEBUG = true;
 
 // $web_server = 'www.betomad.com';
 $web_server = 'rocola.pendulo.com.mx';
+
 $server = ($DEBUG) ? $_SERVER['SERVER_NAME'] : $web_server;
 
 $url = $protocolo.$server.'/rocola/consola/controllers/controller_musica.php';
@@ -66,8 +66,6 @@ function updateLocalDB() {
 
 	// Obtiene la base de datos en formato json
   	$db = json_decode($result, true);
-
-  	// print_r($db);
 
   	// Ahora va a guardar la base en el servidor local
 	mysqli_autocommit($conn, FALSE);

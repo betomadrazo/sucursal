@@ -49,12 +49,11 @@ audio.autoplay = false;
 
 var idCurrentSong = 0;
 
-
 var tiempoRestante;
 
-var url = (DEBUG) ? '/rocola/consola/controllers/controller_musica.php' 
-				  				: 'http://rocola.pendulo.com.mx/rocola/consola/controllers/controller_musica.php';
-				  				// : 'http://www.betomad.com/rocola/consola/controllers/controller_musica.php';
+var url = (DEBUG) ? '/rocola/consola/controllers/controller_musica.php' : 'http://rocola.pendulo.com.mx/rocola/consola/controllers/controller_musica.php'; // : 'http://www.betomad.com/rocola/consola/controllers/controller_musica.php';
+
+// var url = '/rocola/consola/controllers/controller_musica.php'
 
 var url_local = 'backend/local.php';
 
