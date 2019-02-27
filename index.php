@@ -6,7 +6,7 @@ if(isset($_GET['usuario'])) {
     $_SESSION['usuario'] = $_GET['usuario'];
 }
 
-$DEBUG = true;
+$DEBUG = false;
 
 if(!isset($_SESSION['usuario'])) {
     echo urlencode($_SERVER['REQUEST_URI']);
