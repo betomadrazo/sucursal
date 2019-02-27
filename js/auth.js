@@ -16,7 +16,6 @@ $(function() {
 			crossDomain: true,
 			data: formulario,
 			success: function(response) {
-				console.log(response);
 				if(response.auth) {
 					window.location.replace(`/sucursal/index.php?usuario=${response.usuario}`);
 				} else $('.msg_fail').css({'display':'block'});

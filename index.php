@@ -6,7 +6,7 @@ if(isset($_GET['usuario'])) {
     $_SESSION['usuario'] = $_GET['usuario'];
 }
 
-$DEBUG = false;
+$DEBUG = true;
 
 if(!isset($_SESSION['usuario'])) {
     echo urlencode($_SERVER['REQUEST_URI']);
@@ -75,6 +75,7 @@ if(!isset($_SESSION['usuario'])) {
 
 <script src="js/sucursal.js"></script>
 <script src="js/player.js"></script>
+<script src="js/checador_ventana.js"></script>
 
 </html>
 

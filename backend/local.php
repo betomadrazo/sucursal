@@ -12,7 +12,7 @@ $protocolo = 'http://';
 
 $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database) or die("no se pudo conectar.");
 
-$DEBUG = false;
+$DEBUG = true;
 
 // $web_server = 'www.betomad.com';
 $web_server = 'rocola.pendulo.com.mx';

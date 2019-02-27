@@ -4,6 +4,8 @@ $(function() {
 
 var nombreSucursal;
 
+var segundaVentana = false;
+
 // alert(sucursalId);
 switch(parseInt(sucursalId)) {
 	case 10:
@@ -38,8 +40,6 @@ switch(parseInt(sucursalId)) {
 $('.nombre_sucursal').html(nombreSucursal).css({'display':'inline-block', 'margin':'0', 'float': 'left'});
 
 window.history.pushState({}, document.title, "/sucursal/index.php");
-console.log(sucursalId);
-
 
 var cola = [];
 
@@ -70,13 +70,10 @@ function getQueue() {
 		dataType: 'json',
 		crossDomain: true,
 		data: {
-				accion: 'get_queue',
-				sucursal_id: sucursalId
+			accion: 'get_queue',
+			sucursal_id: sucursalId
 		},
 		success: function(queue) {
-
-			console.log("quiú", queue);
-
 
 			if(queue.length) {
 				if(queue[0] === idCurrentSong) {
@@ -97,7 +94,6 @@ function getQueue() {
 
 
 function getSongsInQueue(queue) {
-	console.log("	wueue: ", queue);
 	$.ajax({
 		url: url_local,
 		type: 'GET',
@@ -281,7 +277,6 @@ function Song(info, index) {
 
 
 function checkQueueStatus() {
-	console.log("here");
 	$.ajax({
 		url: url,
 		type: 'POST',
@@ -291,19 +286,33 @@ function checkQueueStatus() {
 			accion: 'update_status_canciones_pedidas',
 			sucursal_id: sucursalId,
 		},
-		// success: function(resp) {
-		// 	console.log(resp)
-		// },
-		// error: function(a, e) {
-		// 	console.log(a, e);
-		// }
 	});
 }
 
-
 // AQUÍ INICIA TODO
-checkQueueStatus();
-getQueue();
+
+// Checa si hay otra ventana abierta antes de empezar a tocar la canción
+window.onload = function() {
+	// localStorage.timeStamp = null;
+	console.log(localStorage);
+	if(localStorage.timeStamp == "null") {
+		localStorage.timeStamp = Date.now();
+		checkQueueStatus();
+		getQueue();
+	} else {
+		$('.actualizando').css({'display': 'block'});
+		$('.actualizando_mensaje').html("Hay otro reproductor abierto.");
+		segundaVentana = true;
+	}
+}
+
+window.onunload = function() {
+	if(segundaVentana) {
+		segundaVentana = false;
+	} else {
+		localStorage.timeStamp = null;
+	}
+}
 
 
 $('#actualiza-catalogo').on('click', function() {
@@ -333,7 +342,6 @@ function actualizaCatalogo() {
 		}
 	});
 }
-
 
 // La canción termina
 audio.addEventListener('ended',function() {
