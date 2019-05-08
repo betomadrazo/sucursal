@@ -75,7 +75,6 @@ if(!isset($_SESSION['usuario'])) {
 
 <script src="js/sucursal.js"></script>
 <script src="js/player.js"></script>
-<script src="js/checador_ventana.js"></script>
 
 </html>
 
