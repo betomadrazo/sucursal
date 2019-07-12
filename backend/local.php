@@ -8,7 +8,7 @@ include "../secrets.php";
 
 $database = 'rocola';
 
-$protocolo = 'http://';
+$protocolo = 'https://';
 
 $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database) or die("no se pudo conectar.");
 

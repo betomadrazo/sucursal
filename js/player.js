@@ -1,7 +1,6 @@
 
 $(function() {
 
-
 var nombreSucursal;
 
 var segundaVentana = false;
@@ -50,8 +49,6 @@ audio.autoplay = false;
 var idCurrentSong = 0;
 
 var tiempoRestante;
-
-var url = (DEBUG) ? '/rocola/consola/controllers/controller_musica.php' : 'http://rocola.pendulo.com.mx/rocola/consola/controllers/controller_musica.php'; // : 'http://www.betomad.com/rocola/consola/controllers/controller_musica.php';
 
 // var url = '/rocola/consola/controllers/controller_musica.php'
 
@@ -293,8 +290,6 @@ function checkQueueStatus() {
 
 // Checa si hay otra ventana abierta antes de empezar a tocar la canción
 window.onload = function() {
-	// localStorage.timeStamp = null;
-	console.log(localStorage);
 	if(localStorage.timeStamp == "null") {
 		localStorage.timeStamp = Date.now();
 		checkQueueStatus();
@@ -345,9 +340,6 @@ function actualizaCatalogo() {
 
 // La canción termina
 audio.addEventListener('ended',function() {
-
-	console.log(idCurrentSong);
-
 	// Envía la hora en que se tocó
 	playedAt(cola[0].id);
 
@@ -358,7 +350,6 @@ audio.addEventListener('ended',function() {
 		// obtenemos el id de la canción 
 		var nextSong = parseInt(cola[0].id);
 	}
-
 	// borra el primer elemento de cola
 	cola.shift();
 

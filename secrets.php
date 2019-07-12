@@ -3,7 +3,7 @@
 $secrets = array(
 	'host'=>'localhost',
 	'user'=>'rocola', 
-	'password'=>'rocolapendulo',
+	'password'=>'rocola8792',
 );
 
 ?>

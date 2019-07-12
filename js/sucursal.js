@@ -16,3 +16,11 @@ var sucursalId = 17;
 
 
 var DEBUG = false;
+
+
+
+const protocol = 'https:';
+const webLocation = 'rocola.pendulo.com.mx/rocola/consola/controllers/controller_musica.php' 
+
+var url = (DEBUG) ? '/rocola/consola/controllers/controller_musica.php' 
+                  : `${protocol}//${webLocation}`;
