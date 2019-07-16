@@ -82,8 +82,6 @@ function getQueue() {
 			}
 		},
 		error: function(e, a) { 
-			console.log("vale verga", e, a)
-
 			playRandomSong();
 		}
 	});
