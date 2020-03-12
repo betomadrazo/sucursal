@@ -8,6 +8,7 @@ if(isset($_GET['usuario'])) {
 
 $DEBUG = false;
 
+// This could cause problems when using another port
 if(!isset($_SESSION['usuario'])) {
     echo urlencode($_SERVER['REQUEST_URI']);
     header("Location: /sucursal/auth.php?sitio=".urlencode("http://localhost/sucursal/index.php")); //urlencode($_SERVER['REQUEST_URI']));
@@ -41,6 +42,7 @@ if(!isset($_SESSION['usuario'])) {
                 <span style="display:block;">Salir</span>
             </a>
 
+            <button id="panic" class="voton panic-btn">Pánico!</button>
         </div>
     
         <div class="cancion_row">
