@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS canciones_local (
     song_path VARCHAR (200),
     artista VARCHAR (200),
     coleccion_id INT UNSIGNED,
-    last_played TIME,
+    last_played TIMESTAMP NULL DEFAULT NULL,
+    random_shift ENUM ("morning", "evening") DEFAULT NULL,
     FOREIGN KEY (coleccion_id) REFERENCES colecciones(id) ON DELETE CASCADE
 );
 
@@ -30,4 +31,14 @@ CREATE TABLE IF NOT EXISTS canciones_coleccionadas_local (
     FOREIGN KEY (coleccion_id) REFERENCES colecciones_local(id) ON DELETE CASCADE,
     FOREIGN KEY (cancion_id) REFERENCES canciones_local(id) ON DELETE CASCADE,
     PRIMARY KEY(coleccion_id, cancion_id)
+);
+
+CREATE TABLE IF NOT EXISTS random_songs (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR (200),
+  duration VARCHAR(8),
+  song_path VARCHAR(200),
+  artist VARCHAR(200),
+  shift ENUM('morning', 'evening'),
+  last_played TIME
 );

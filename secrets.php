@@ -1,9 +1,9 @@
 <?php
 
 $secrets = array(
-	'host'=>'localhost',
-	'user'=>'rocola', 
-	'password'=>'rocola8792',
+    'host'=>'localhost',
+    'user'=>'rocola', 
+    'password'=>'rocola8792',
 );
 
 ?>

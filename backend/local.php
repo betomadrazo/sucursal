@@ -1,57 +1,55 @@
 <?php
 
+
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+
+
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
 header('Content-Type: application/json; charset=utf-8');
 
 include "../secrets.php";
 
+$DEBUG = true;
 $database = 'rocola';
-
 $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database) or die("no se pudo conectar.");
-
-$DEBUG = false;
-
 $web_server = 'rocola.pendulo.com.mx';
-
 $server = ($DEBUG) ? $_SERVER['SERVER_NAME'] : $web_server;
-
 $protocolo = $DEBUG ? 'http://' : 'https://';
-
 $url = $protocolo . $server . '/rocola/consola/controllers/controller_musica.php';
 
 
-if (isset($_GET['accion']) && $_GET['accion'] === 'update_db') {
-    echo json_encode(updateLocalDB());
-}
+if (isset($_GET['accion'])) {
+    $action = $_GET['accion'];
 
-
-if (isset($_POST['accion']) && $_POST['accion'] === 'update_colecciones_local') {
-    echo json_encode(updateColeccionesLocal($_POST['colecciones'], $_POST['canciones_coleccionadas']));
-}
-
-
-if (isset($_POST['accion']) && $_POST['accion'] === 'update_last_played') {
-    playedAt((int) $_POST['cancion_id'], (int) $_POST['sucursal_id']);
-}
-
-
-if (isset($_GET['accion']) && $_GET['accion'] === 'get_songs_in_queue') {
-    if (isset($_GET['songs'])) {
-        echo getSongsInQueue($_GET['songs']);
-    } else {
-        echo json_encode(array('msg' => 'No hay cola'));
+    if ($action === 'update_db') {
+        echo json_encode(updateLocalDB());
+    }
+    if ($action === 'get_random_song') {
+        echo getRandomSong();
+    }
+    if ($action === 'get_songs_in_queue') {
+        if (isset($_GET['songs'])) {
+            echo getSongsInQueue($_GET['songs']);
+        } else {
+            echo json_encode(array('msg' => 'No hay cola'));
+        }
     }
 }
 
+if (isset($_POST['accion'])) {
+    $action = $_POST['accion'];
 
-if (isset($_GET['accion']) && $_GET['accion'] === 'get_random_song') {
-    echo getRandomSong();
-}
-
-
-if (isset($_POST['accion']) && $_POST['accion'] === 'panic_button') {
-    echo pushPanicButton($_POST['id_sucursal']);
+    if ($action === 'update_colecciones_local') {
+        echo json_encode(updateColeccionesLocal($_POST['colecciones'], $_POST['canciones_coleccionadas']));
+    }
+    if ($action === 'update_last_played') {
+        playedAt((int) $_POST['cancion_id'], (int) $_POST['sucursal_id']);
+    }
+    if ($action === 'panic_button') {
+        echo pushPanicButton($_POST['id_sucursal']);
+    }
 }
 
 
@@ -80,8 +78,9 @@ function updateLocalDB()
     mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 1") or die(mysqli_error($conn));
 
     foreach ($db as $d) {
-        $q = "INSERT INTO canciones_local(id, titulo, duracion, artista, song_path) 
-			  VALUES({$d['id']}, \"{$d['titulo']}\", \"{$d['duracion']}\", \"{$d['artista']}\", \"{$d['song_path']}\")";
+        $random_shift = $d['random_shift'] == null ? "NULL" : "\"{$d['random_shift']}\"";
+        $q = "INSERT INTO canciones_local(id, titulo, duracion, artista, song_path, random_shift) 
+              VALUES({$d['id']}, \"{$d['titulo']}\", \"{$d['duracion']}\", \"{$d['artista']}\", \"{$d['song_path']}\", $random_shift)";
         mysqli_query($conn, $q) or die(mysqli_error($conn));
     }
 
@@ -113,28 +112,30 @@ function updateColeccionesLocal($colecciones, $canciones_coleccionadas)
     mysqli_query(
         $conn,
         "CREATE TABLE IF NOT EXISTS canciones_coleccionadas_local (
-	    coleccion_id INT UNSIGNED,
-	    cancion_id INT UNSIGNED,
-	    FOREIGN KEY (coleccion_id) REFERENCES colecciones_local(id) ON DELETE CASCADE,
-	    FOREIGN KEY (cancion_id) REFERENCES canciones_local(id) ON DELETE CASCADE,
-	    PRIMARY KEY(coleccion_id, cancion_id)
-	)"
+        coleccion_id INT UNSIGNED,
+        cancion_id INT UNSIGNED,
+        FOREIGN KEY (coleccion_id) REFERENCES colecciones_local(id) ON DELETE CASCADE,
+        FOREIGN KEY (cancion_id) REFERENCES canciones_local(id) ON DELETE CASCADE,
+        PRIMARY KEY(coleccion_id, cancion_id))"
     );
 
+    mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 0");
     mysqli_query($conn, "TRUNCATE TABLE colecciones_local");
 
     foreach ($colecciones as $c) {
         $q = "INSERT INTO colecciones_local(id, hora_inicio, hora_fin, activa) 
-			  VALUES({$c['id']}, \"{$c['hora_inicio']}\", \"{$c['hora_fin']}\", {$c['activa']})";
+              VALUES({$c['id']}, \"{$c['hora_inicio']}\", \"{$c['hora_fin']}\", {$c['activa']})";
         mysqli_query($conn, $q);
     }
 
     foreach ($canciones_coleccionadas as $d) {
         $q = "INSERT INTO canciones_coleccionadas_local(coleccion_id, cancion_id) 
-			  VALUES({$d['coleccion_id']},{$d['cancion_id']})";
+              VALUES({$d['coleccion_id']},{$d['cancion_id']})";
 
         mysqli_query($conn, $q);
     }
+
+    mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 1");
 
     if (mysqli_commit($conn)) {
         return array("colecciones_actualizadas" => true);
@@ -166,15 +167,40 @@ function getSongsInQueue($data)
             );
             array_push($canciones, $cancion);
         }
-
         return json_encode($canciones);
     }
-
     return json_encode(array('queue' => false));
 }
 
 
-function getRandomSong()
+function getRandomSong() {
+    global $conn;
+    $current_time = getHora();
+    $current_shift = ($current_time >= "08:00" && $current_time < "17:00")
+    ? "morning" : "evening";
+
+    $clausula_horas = "(last_played IS NULL OR TIMEDIFF(CURTIME(), last_played) >= '3:00:00')";
+
+    $q = "SELECT id FROM canciones_local WHERE random_shift='$current_shift' AND $clausula_horas";
+    $q .= "ORDER BY RAND() LIMIT 1";
+
+    $r = mysqli_query($conn, $q);
+
+    if ($r && mysqli_num_rows($r)) {
+        $random_song_id = mysqli_fetch_row($r)[0];
+        return json_encode(array($random_song_id));
+    }
+
+    $q = "SELECT id FROM canciones_local WHERE random_shift='$current_shift'";
+    $q .= "ORDER BY RAND() LIMIT 1";
+
+    $r = mysqli_query($conn, $q);
+    $random_song_id = mysqli_fetch_row($r)[0];
+    return json_encode(array($random_song_id));
+}
+
+
+function getLegacyRandomSong()
 {
     global $conn;
     $hora = getHora();
@@ -222,38 +248,41 @@ function getRandomSong()
             if ($res && mysqli_num_rows($res)) {
                 $cancion_random = mysqli_fetch_assoc($res)['id'];
                 return json_encode(array($cancion_random));
-            } else {
-                $q =  "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
-                $res = mysqli_query($conn, $q);
-                if ($res && mysqli_num_rows($res)) {
-                    $cancion_random = mysqli_fetch_assoc($res)['id'];
-                    return json_encode(array($cancion_random));
-                } else {
-                    return json_encode(array("error" => "No hay canciones!"));
-                }
             }
-        } else {
-            // No hay colecciones activas, tomar una canción de la colección entera.
             $q =  "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
             $res = mysqli_query($conn, $q);
             if ($res && mysqli_num_rows($res)) {
                 $cancion_random = mysqli_fetch_assoc($res)['id'];
                 return json_encode(array($cancion_random));
-            } else {
-                return json_encode(array("error" => "No hay canciones!"));
             }
+            return json_encode(array("error" => "No hay canciones!"));
         }
-    } else {
+        // No hay colecciones activas, tomar una canción de la colección entera.
         $q =  "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
         $res = mysqli_query($conn, $q);
         if ($res && mysqli_num_rows($res)) {
             $cancion_random = mysqli_fetch_assoc($res)['id'];
             return json_encode(array($cancion_random));
-        } else {
-            return json_encode(array("error" => "No hay canciones!"));
-        }
+        } 
+        return json_encode(array("error" => "No hay canciones!"));
     }
+    $q =  "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
+    $res = mysqli_query($conn, $q);
+    if ($res && mysqli_num_rows($res)) {
+        $cancion_random = mysqli_fetch_assoc($res)['id'];
+        return json_encode(array($cancion_random));
+    }
+    return json_encode(array("error" => "No hay canciones!"));
 }
+
+
+function AgetRandomSong()
+{
+    global $conn;
+
+    $clausula_horas = "TIMEDIFF(NOW(), last_played) >= '01:00:00'";
+}
+
 
 
 function getHora()
@@ -334,5 +363,5 @@ function pushPanicButton($id_sucursal)
     $server_output = curl_exec($ch);
     curl_close($ch);
 
-    return json_encode(array('processed'=> true));
+    return json_encode(array('processed' => true));
 }
