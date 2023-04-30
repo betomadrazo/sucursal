@@ -17,7 +17,7 @@ $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $da
 $web_server = 'rocola.pendulo.com.mx';
 $server = ($DEBUG) ? $_SERVER['SERVER_NAME'] : $web_server;
 $protocolo = $DEBUG ? 'http://' : 'https://';
-$url = $protocolo . $server . '/rocola/consola/controllers/controller_musica.php';
+$url = $protocolo . $server . '/consola/controllers/controller_musica.php';
 
 
 if (isset($_GET['accion'])) {

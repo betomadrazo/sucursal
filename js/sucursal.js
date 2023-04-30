@@ -18,5 +18,5 @@ var sucursalId = 20;
 const protocol = 'https:';
 const webLocation = 'rocola.pendulo.com.mx/rocola/consola/controllers/controller_musica.php' 
 
-var url = (DEBUG) ? '/rocola/consola/controllers/controller_musica.php' 
+var url = (DEBUG) ? '/consola/controllers/controller_musica.php' 
                   : `${protocol}//${webLocation}`;
