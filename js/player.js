@@ -260,6 +260,12 @@ $(function() {
       data: {
         accion: "update_status_canciones_pedidas",
         sucursal_id: sucursalId
+      },
+      success: function(response) {
+        console.log("=> ", response);
+      },
+      error: function(error, err) {
+        console.log(error, err);
       }
     });
   }

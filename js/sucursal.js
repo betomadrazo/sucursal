@@ -10,7 +10,7 @@
 // Pruebas:    20
 
 
-var DEBUG = true;
+var DEBUG = false;
 
 var sucursalId = 20;
 

@@ -11,7 +11,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 include "../secrets.php";
 
-$DEBUG = true;
+$DEBUG = false;
 $database = 'rocola';
 $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database) or die("no se pudo conectar.");
 $web_server = 'rocola.pendulo.com.mx';

@@ -10,7 +10,7 @@ if (isset($_GET['usuario'])) {
     $_SESSION['usuario'] = $_GET['usuario'];
 }
 
-$DEBUG = true;
+$DEBUG = false;
 
 // This could cause problems when using another port
 if (!isset($_SESSION['usuario'])) {
