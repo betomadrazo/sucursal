@@ -119,6 +119,7 @@ function updateColeccionesLocal($colecciones, $canciones_coleccionadas)
         PRIMARY KEY(coleccion_id, cancion_id))"
     );
 
+    
     mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 0");
     mysqli_query($conn, "TRUNCATE TABLE colecciones_local");
 
