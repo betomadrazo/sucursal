@@ -11,12 +11,18 @@ header('Content-Type: application/json; charset=utf-8');
 
 include "../secrets.php";
 
-$DEBUG = false;
+// $DEBUG = false;
 $database = 'rocola';
 $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database) or die("no se pudo conectar.");
-$web_server = 'rocola.pendulo.com.mx';
-$server = ($DEBUG) ? $_SERVER['SERVER_NAME'] : $web_server;
-$protocolo = $DEBUG ? 'http://' : 'https://';
+
+// $web_server = 'rocola.pendulo.com.mx';
+// $server = ($DEBUG) ? $_SERVER['SERVER_NAME'] : $web_server;
+// $protocolo = $DEBUG ? 'http://' : 'https://';
+// $url = $protocolo . $server . '/consola/controllers/controller_musica.php';
+
+$web_server = 'localhost:8080';
+$server = $web_server;
+$protocolo = 'http://';
 $url = $protocolo . $server . '/consola/controllers/controller_musica.php';
 
 
@@ -41,7 +47,7 @@ if (isset($_GET['accion'])) {
 if (isset($_POST['accion'])) {
     $action = $_POST['accion'];
 
-    if ($action === 'update_colecciones_local') {
+    if ($action === 'update_colecciones_local') { // Esto ya no se está usando.
         echo json_encode(updateColeccionesLocal($_POST['colecciones'], $_POST['canciones_coleccionadas']));
     }
     if ($action === 'update_last_played') {
@@ -57,7 +63,7 @@ function updateLocalDB()
 {
     global $conn, $url;
 
-    // Envía el GET request con curl
+    // Envía el GET request a consola con curl
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url . '?accion=get_db');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -69,6 +75,14 @@ function updateLocalDB()
 
     // Obtiene la base de datos en formato json
     $db = json_decode($result, true);
+
+/*     echo "DB:   " . "\n";
+    print_r($db); */
+
+    if ($db == "") {
+        echo "<script>alert('No hay conexión al servidor.');</script>";
+        return;
+    }
 
     // Ahora va a guardar la base en el servidor local
     mysqli_autocommit($conn, FALSE);
@@ -189,7 +203,7 @@ function getRandomSong() {
 
     if ($r && mysqli_num_rows($r)) {
         $random_song_id = mysqli_fetch_row($r)[0];
-        return json_encode(array($random_song_id));
+        return json_encode([$random_song_id]);
     }
 
     $q = "SELECT id FROM canciones_local WHERE random_shift='$current_shift'";
@@ -197,7 +211,7 @@ function getRandomSong() {
 
     $r = mysqli_query($conn, $q);
     $random_song_id = mysqli_fetch_row($r)[0];
-    return json_encode(array($random_song_id));
+    return json_encode([$random_song_id]);
 }
 
 

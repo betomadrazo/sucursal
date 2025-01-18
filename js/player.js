@@ -265,7 +265,7 @@ $(function() {
         console.log("=> ", response);
       },
       error: function(error, err) {
-        console.log(error, err);
+        console.log("ERROR: " + error, "ERR: " + err);
       }
     });
   }
@@ -319,7 +319,7 @@ $(function() {
         accion: "update_db"
       },
       success: function(response) {
-        window.location.reload(false);
+        location.reload(true);
       },
       error: function(error, dd) {
         console.log(error, dd);
@@ -340,7 +340,7 @@ $(function() {
       },
       success: function(response) {
         console.log(response);
-        // window.location.reload(false);
+        location.reload(true);
       },
       error: function(error, dd) {
         console.log("Error: ", error, dd);

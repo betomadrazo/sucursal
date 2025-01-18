@@ -1,0 +1,36 @@
+services:
+  sucursal8:
+    build: ./
+    container_name: sucursal8
+    ports:
+      - "1010:80"
+    volumes:
+      - ./:/var/www/html/sucursal
+      - ../consola/album_artwork:/var/www/html/sucursal/album_artwork
+      - ../consola/artist_photo:/var/www/html/sucursal/artist_photo
+      - ../consola/img:/var/www/html/sucursal/img
+      - ../consola/musica:/var/www/html/sucursal/musica
+      - ../consola/aleatorias_manana:/var/www/html/sucursal/aleatorias_manana
+      - ../consola/aleatorias_tarde:/var/www/html/sucursal/aleatorias_tarde
+    depends_on:
+      - dbsucursal
+    networks:
+      - sucursal-network
+
+  dbsucursal:
+    image: mysql:8.0-oracle
+    container_name: dbsucursal
+    environment:
+      MYSQL_DATABASE: rocola
+      MYSQL_ROOT_PASSWORD: rocola8792
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - sucursal-network
+
+volumes:
+  db-data:
+
+networks:
+  sucursal-network:

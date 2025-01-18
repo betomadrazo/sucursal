@@ -7,7 +7,7 @@ ini_set('display_errors', '1');
 
 include "../secrets.php";
 $database = "rocola";
-$conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database);
+$conn = @new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database);
 
 
 if (isset($_POST['recrear'])) {

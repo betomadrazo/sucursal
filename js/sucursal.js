@@ -10,13 +10,17 @@
 // Pruebas:    20
 
 
-var DEBUG = false;
+// var DEBUG = false;
 
-var sucursalId = 20;
+const sucursalId = 20;
 
+// const protocol = 'http:';
+// const webLocation = 'rocola.pendulo.com.mx/consola/controllers/controller_musica.php'
+// const webLocation = 'localhost:8080/consola/controllers/controller_musica.php'
 
-const protocol = 'https:';
-const webLocation = 'rocola.pendulo.com.mx/consola/controllers/controller_musica.php' 
+// var url = (DEBUG) ? '/consola/controllers/controller_musica.php'
+//                   : `${protocol}//${webLocation}`;
 
-var url = (DEBUG) ? '/consola/controllers/controller_musica.php' 
-                  : `${protocol}//${webLocation}`;
+const protocol = 'http:';
+const webLocation = 'localhost:8080/consola/controllers/controller_musica.php'
+var url = `${protocol}//${webLocation}`;

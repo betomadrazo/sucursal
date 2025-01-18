@@ -1,9 +1,7 @@
 <?php
 
 $secrets = array(
-    'host'=>'localhost',
-    'user'=>'rocola', 
+    'host'=>'dbsucursal',
+    'user'=>'rocola',
     'password'=>'rocola8792',
 );
-
-?>
