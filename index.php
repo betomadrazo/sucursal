@@ -75,9 +75,9 @@ if (!isset($_SESSION['usuario'])) {
         </div>
     </div>
 
+    <script src="js/jquery.js"></script>
+    <script src="js/sucursal.js"></script>
+    <script src="js/player.js"></script>
 </body>
-<script src="js/jquery.js"></script>
-<script src="js/sucursal.js"></script>
-<script src="js/player.js"></script>
 
 </html>

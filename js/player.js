@@ -1,5 +1,4 @@
 $(function() {
-    console.log("1");
   var nombreSucursal;
   console.log("id sucursal: ", sucursalId);
 
@@ -33,7 +32,6 @@ $(function() {
       break;
   }
 
-  console.log("2, NOMBRE SUCURSAL: ", nombreSucursal);
 
   $(".nombre_sucursal")
     .html(nombreSucursal)
@@ -90,7 +88,6 @@ $(function() {
         songs: queue
       },
       success: function(songs) {
-        console.log("SONGS IN QUEUE: ", JSON.stringify(songs));
         if (songs.length) {
           // traer la info de la canción de la db local
           for (var s of songs) {
@@ -129,9 +126,9 @@ $(function() {
     });
   }
 
-  function fillWithSongs(fakeSongs, lista) {
+  function fillWithSongs(songs, lista) {
     var canciones = "";
-    for (const [index, s] of fakeSongs.entries()) {
+    for (const [index, s] of songs.entries()) {
       canciones += Song(s, index);
     }
 
@@ -269,30 +266,29 @@ $(function() {
 
   // AQUÍ INICIA TODO
 
-  window.onload = function() {
-    console.log("3, ONLOAD");
-    // Check if there is player window open
-    if (localStorage.playerIsOpen == "true") {
-      $(".actualizando").css({ display: "block" });
-      $(".actualizando_mensaje").html("Hay otro reproductor abierto.");
-    } else {
-      // If there isn't, go on
-      this.setInterval(function() {
-        localStorage.playerIsOpen = "true";
-      }, 1000);
-      checkQueueStatus();
-      getQueue();
+    window.onload = init();
+
+    function init () {
+        if (localStorage.playerIsOpen == "true") {
+          $(".actualizando").css({ display: "block" });
+          $(".actualizando_mensaje").html("Hay otro reproductor abierto.");
+        } else {
+          setInterval(function () {
+            localStorage.playerIsOpen = "true";
+          }, 1000);
+          checkQueueStatus();
+          getQueue();
+        }
     }
-  };
 
-  window.addEventListener("beforeunload", function(e) {
-    localStorage.playerIsOpen = "false";
-  });
+window.addEventListener("beforeunload", function(e) {
+  localStorage.playerIsOpen = "false";
+});
 
-//   window.onunload = function(e) {
-//     e.preventDefault();
-//     localStorage.playerIsOpen = "false";
-//   };
+window.onunload = function(e) {
+  e.preventDefault();
+  localStorage.playerIsOpen = "false";
+};
 
   $("#actualiza-catalogo").on("click", function() {
     if (confirm("¿Actualizar el catálogo?")) {
@@ -373,5 +369,4 @@ $(function() {
       .css("border", "1px solid")
       .remove();
   });
-  console.log("2");
 });
