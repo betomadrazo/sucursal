@@ -41,14 +41,12 @@ $(function() {
   var cola = [];
 
   var audio = document.getElementById("plyr");
-  audio.volume = 0.5;
+  audio.volume = 0.01;
   audio.autoplay = false;
 
   var idCurrentSong = 0;
 
   var tiempoRestante;
-
-  // var url = '/rocola/consola/controllers/controller_musica.php'
 
   var url_local = "backend/local.php";
 
@@ -94,6 +92,7 @@ $(function() {
         songs: queue
       },
       success: function(songs) {
+        console.log("SONGS IN QUEUE: ", JSON.stringify(songs));
         if (songs.length) {
           // traer la info de la canción de la db local
           for (var s of songs) {
@@ -104,7 +103,7 @@ $(function() {
           playSong(cola[0], cola[0].id);
         } else {
           playRandomSong();
-          console.log("There was an error and random songs are on.");
+          console.log("No hay canciones en cola; poniendo una canción aleatoria.");
         }
       },
       error: function(response, c) {
@@ -265,7 +264,7 @@ $(function() {
         console.log("=> ", response);
       },
       error: function(error, err) {
-        console.log("ERROR: " + error, "ERR: " + err);
+        console.log("ERROR: " + JSON.stringify(error), "ERR: " + err);
       }
     });
   }

@@ -2,7 +2,7 @@
 
 
 error_reporting(E_ALL);
-ini_set('display_errors', '1');
+ini_set('display_errors', 1);
 
 
 header('Access-Control-Allow-Origin: *');
@@ -20,10 +20,10 @@ $conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $da
 // $protocolo = $DEBUG ? 'http://' : 'https://';
 // $url = $protocolo . $server . '/consola/controllers/controller_musica.php';
 
-$web_server = 'localhost:8080';
-$server = $web_server;
 $protocolo = 'http://';
-$url = $protocolo . $server . '/consola/controllers/controller_musica.php';
+$web_server = '172.17.0.1:8080';
+$server = $web_server;
+$url = "{$protocolo}{$server}/consola/controllers/controller_musica.php";
 
 
 if (isset($_GET['accion'])) {
@@ -33,14 +33,15 @@ if (isset($_GET['accion'])) {
         echo json_encode(updateLocalDB());
     }
     if ($action === 'get_random_song') {
-        echo getRandomSong();
+        echo json_encode(getRandomSong());
     }
     if ($action === 'get_songs_in_queue') {
         if (isset($_GET['songs'])) {
             echo getSongsInQueue($_GET['songs']);
         } else {
-            echo json_encode(array('msg' => 'No hay cola'));
+            echo json_encode(['msg' => 'No hay cola']);
         }
+        exit();
     }
 }
 
@@ -50,9 +51,13 @@ if (isset($_POST['accion'])) {
     if ($action === 'update_colecciones_local') { // Esto ya no se está usando.
         echo json_encode(updateColeccionesLocal($_POST['colecciones'], $_POST['canciones_coleccionadas']));
     }
+
     if ($action === 'update_last_played') {
-        playedAt((int) $_POST['cancion_id'], (int) $_POST['sucursal_id']);
+        $song = (int) $_POST['cancion_id'];
+        $sucursal = (int) $_POST['sucursal_id'];
+        playedAt($song, $sucursal);
     }
+
     if ($action === 'panic_button') {
         echo pushPanicButton($_POST['id_sucursal']);
     }
@@ -63,26 +68,7 @@ function updateLocalDB()
 {
     global $conn, $url;
 
-    // Envía el GET request a consola con curl
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url . '?accion=get_db');
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-    $result = curl_exec($ch);
-
-    curl_close($ch);
-
-    // Obtiene la base de datos en formato json
-    $db = json_decode($result, true);
-
-/*     echo "DB:   " . "\n";
-    print_r($db); */
-
-    if ($db == "") {
-        echo "<script>alert('No hay conexión al servidor.');</script>";
-        return;
-    }
+    $db = fetchFromServer('get_db');
 
     // Ahora va a guardar la base en el servidor local
     mysqli_autocommit($conn, FALSE);
@@ -93,7 +79,7 @@ function updateLocalDB()
 
     foreach ($db as $d) {
         $random_shift = $d['random_shift'] == null ? "NULL" : "\"{$d['random_shift']}\"";
-        $q = "INSERT INTO canciones_local(id, titulo, duracion, artista, song_path, random_shift) 
+        $q = "INSERT INTO canciones_local(id, titulo, duracion, artista, song_path, random_shift)
               VALUES({$d['id']}, \"{$d['titulo']}\", \"{$d['duracion']}\", \"{$d['artista']}\", \"{$d['song_path']}\", $random_shift)";
         mysqli_query($conn, $q) or die(mysqli_error($conn));
     }
@@ -101,18 +87,33 @@ function updateLocalDB()
     mysqli_commit($conn);
 
     // Actualiza las colecciones
+    $result = fetchFromServer('get_colecciones_para_sucursales');
+
+    // Obtiene la base de datos en formato json
+    updateColeccionesLocal($result['colecciones'], $result['canciones_coleccionadas']);
+}
+
+function fetchFromServer($endpoint)
+{
+    global $url;
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url . "?accion=get_colecciones_para_sucursales");
+    curl_setopt($ch, CURLOPT_URL, "$url?accion=$endpoint");
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+    // echo "URL-> " . "$url?accion=$endpoint" . "\n";
 
     $result = curl_exec($ch);
 
+    if (curl_errno($ch)) {
+        echo "curl ERROR: " . curl_error($ch);
+    } else {
+        $result = json_decode($result, true);
+    }
+
     curl_close($ch);
 
-    // Obtiene la base de datos en formato json
-    $colecciones = json_decode($result, true);
-
-    updateColeccionesLocal($colecciones['colecciones'], $colecciones['canciones_coleccionadas']);
+    return $result;
 }
 
 
@@ -133,18 +134,18 @@ function updateColeccionesLocal($colecciones, $canciones_coleccionadas)
         PRIMARY KEY(coleccion_id, cancion_id))"
     );
 
-    
+
     mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 0");
     mysqli_query($conn, "TRUNCATE TABLE colecciones_local");
 
     foreach ($colecciones as $c) {
-        $q = "INSERT INTO colecciones_local(id, hora_inicio, hora_fin, activa) 
+        $q = "INSERT INTO colecciones_local(id, hora_inicio, hora_fin, activa)
               VALUES({$c['id']}, \"{$c['hora_inicio']}\", \"{$c['hora_fin']}\", {$c['activa']})";
         mysqli_query($conn, $q);
     }
 
     foreach ($canciones_coleccionadas as $d) {
-        $q = "INSERT INTO canciones_coleccionadas_local(coleccion_id, cancion_id) 
+        $q = "INSERT INTO canciones_coleccionadas_local(coleccion_id, cancion_id)
               VALUES({$d['coleccion_id']},{$d['cancion_id']})";
 
         mysqli_query($conn, $q);
@@ -153,49 +154,51 @@ function updateColeccionesLocal($colecciones, $canciones_coleccionadas)
     mysqli_query($conn, "SET FOREIGN_KEY_CHECKS = 1");
 
     if (mysqli_commit($conn)) {
-        return array("colecciones_actualizadas" => true);
+        return ["colecciones_actualizadas" => true];
     }
 
-    return array("colecciones_actualizadas" => false);
+    return ["colecciones_actualizadas" => false];
 }
 
 
-function getSongsInQueue($data)
+function getSongsInQueue($queue)
 {
     global $conn;
 
-    $buena_cola = implode(",", $data);
+    $queue = implode(",", $queue);
 
-    $q =  "SELECT * FROM canciones_local WHERE id IN(" . implode(',', $data) . ") ORDER BY FIELD(id, {$buena_cola})";
+    $q = "SELECT * FROM canciones_local WHERE id IN($queue) ORDER BY FIELD(id, {$queue})";
 
     $res = mysqli_query($conn, $q);
 
-    $canciones = array();
+    $canciones = [];
     if (mysqli_num_rows($res)) {
         while ($row = mysqli_fetch_assoc($res)) {
-            $cancion = array(
+            $cancion = [
                 'id' => $row['id'],
                 'titulo' => ($row['titulo']),
                 'duracion' => $row['duracion'],
                 'path' => ($row['song_path']),
                 'artista' => ($row['artista'])
-            );
+            ];
             array_push($canciones, $cancion);
         }
         return json_encode($canciones);
     }
-    return json_encode(array('queue' => false));
+    return json_encode(['queue' => false]);
 }
 
 
-function getRandomSong() {
+function getRandomSong()
+{
     global $conn;
     $current_time = getHora();
     $current_shift = ($current_time >= "08:00" && $current_time < "17:00")
-    ? "morning" : "evening";
+        ? "morning" : "evening";
 
     $clausula_horas = "(last_played IS NULL OR TIMEDIFF(CURTIME(), last_played) >= '3:00:00')";
 
+    // Mejor caso
     $q = "SELECT id FROM canciones_local WHERE random_shift='$current_shift' AND $clausula_horas";
     $q .= "ORDER BY RAND() LIMIT 1";
 
@@ -206,99 +209,28 @@ function getRandomSong() {
         return json_encode([$random_song_id]);
     }
 
+    // Si se agotaron las canciones del turno, repite alguna canción
     $q = "SELECT id FROM canciones_local WHERE random_shift='$current_shift'";
     $q .= "ORDER BY RAND() LIMIT 1";
 
     $r = mysqli_query($conn, $q);
-    $random_song_id = mysqli_fetch_row($r)[0];
-    return json_encode([$random_song_id]);
-}
 
-
-function getLegacyRandomSong()
-{
-    global $conn;
-    $hora = getHora();
-    $hora_pedida = date("H:i", strtotime("-1 hour America/Mexico_City"));
-
-    // La diferencia de horas que deben pasar para que la canción pueda ser tocada nuevamente
-    // $clausula_horas = "(TIMEDIFF(CURTIME(), last_played) >= '3:00:00' OR last_played IS NULL)";
-    // $clausula_horas = "SUBDATE(NOW(), INTERVAL 3 HOUR) >= last_played";
-    $clausula_horas = "TIMEDIFF(NOW(), last_played) >= '01:00:00'";
-
-    // Obtiene las id de las colecciones activas
-    // $activas_q = "SELECT id FROM colecciones_local WHERE activa=1 AND ((CURTIME() >= hora_inicio AND CURTIME() <= hora_fin) OR hora_inicio = hora_fin)";
-    $activas_q = "SELECT id FROM colecciones_local WHERE activa=1 AND ((CURTIME() >= hora_inicio AND CURTIME() <= hora_fin) OR hora_inicio = hora_fin)";
-    $res = mysqli_query($conn, $activas_q);
-
-    // Si hay canciones en colecciones activas y que lleven más de 3 horas de haber sido tocadas
-    if ($res && mysqli_num_rows($res)) {
-        // if(mysqli_num_rows($res)) {
-        $canciones = array();
-
-        while ($row = mysqli_fetch_assoc($res)) {
-            array_push($canciones, $row['id']);
-        }
-
-        $canciones_coleccionadas_q = "SELECT cancion_id FROM canciones_coleccionadas_local WHERE coleccion_id IN(" . implode(",", $canciones) . ")";
-        $res = mysqli_query($conn, $canciones_coleccionadas_q);
-
-        $ids_canciones = array();
-        while ($row = mysqli_fetch_assoc($res)) {
-            array_push($ids_canciones, $row['cancion_id']);
-        }
-
-        $q =  "SELECT id FROM canciones_local WHERE id IN(" . implode(',', $ids_canciones) . ") AND " . $clausula_horas . " ORDER BY RAND() LIMIT 1";
-
-        $res = mysqli_query($conn, $q);
-
-        // Aquí regresa un número
-        // Si hay elementos, regresa uno aleatorio dentro de la colección
-        if ($res && mysqli_num_rows($res)) {
-            $cancion_random = mysqli_fetch_assoc($res)['id'];
-            return json_encode(array($cancion_random));
-        } elseif ($res && !mysqli_num_rows($res)) {
-            $q =  "SELECT id FROM canciones_local WHERE " . $clausula_horas . " ORDER BY RAND() LIMIT 1";
-            $res = mysqli_query($conn, $q);
-            if ($res && mysqli_num_rows($res)) {
-                $cancion_random = mysqli_fetch_assoc($res)['id'];
-                return json_encode(array($cancion_random));
-            }
-            $q =  "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
-            $res = mysqli_query($conn, $q);
-            if ($res && mysqli_num_rows($res)) {
-                $cancion_random = mysqli_fetch_assoc($res)['id'];
-                return json_encode(array($cancion_random));
-            }
-            return json_encode(array("error" => "No hay canciones!"));
-        }
-        // No hay colecciones activas, tomar una canción de la colección entera.
-        $q =  "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
-        $res = mysqli_query($conn, $q);
-        if ($res && mysqli_num_rows($res)) {
-            $cancion_random = mysqli_fetch_assoc($res)['id'];
-            return json_encode(array($cancion_random));
-        } 
-        return json_encode(array("error" => "No hay canciones!"));
+    if ($r && mysqli_num_rows($r)) {
+        $random_song_id = mysqli_fetch_row($r)[0];
+        return json_encode([$random_song_id]);
     }
-    $q =  "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
-    $res = mysqli_query($conn, $q);
-    if ($res && mysqli_num_rows($res)) {
-        $cancion_random = mysqli_fetch_assoc($res)['id'];
-        return json_encode(array($cancion_random));
+
+    $q = "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
+
+    $r = mysqli_query($conn, $q);
+
+    if ($r && mysqli_num_rows($r)) {
+        $random_song_id = mysqli_fetch_row($r)[0];
+        return json_encode([$random_song_id]);
     }
-    return json_encode(array("error" => "No hay canciones!"));
+
+    return [42];
 }
-
-
-function AgetRandomSong()
-{
-    global $conn;
-
-    $clausula_horas = "TIMEDIFF(NOW(), last_played) >= '01:00:00'";
-}
-
-
 
 function getHora()
 {
@@ -320,11 +252,11 @@ function postCancionesDesactivadasEnSucursal($sucursal_id)
 {
     global $conn, $url;
 
-    $canciones = array(
+    $canciones = [
         'accion' => 'post_canciones_desactivadas_en_sucursal',
         'id_sucursal' => $sucursal_id,
-        'ids_canciones' => array()
-    );
+        'ids_canciones' => []
+    ];
 
     // Obtener los ids de las canciones que tengan menos de 3 horas de ser tocadas
     $q = "SELECT id from canciones_local WHERE TIMEDIFF(NOW(), last_played) < '3:00:00'";
@@ -360,10 +292,10 @@ function pushPanicButton($id_sucursal)
     $q = "UPDATE canciones_local SET last_played=NULL";
     mysqli_query($conn, $q);
 
-    $sucursal = array(
+    $sucursal = [
         'accion' => 'delete_songs_from_sucursal',
         'id_sucursal' => $id_sucursal
-    );
+    ];
 
     $panic_button_action = http_build_query($sucursal);
 
@@ -378,5 +310,5 @@ function pushPanicButton($id_sucursal)
     $server_output = curl_exec($ch);
     curl_close($ch);
 
-    return json_encode(array('processed' => true));
+    return json_encode(['processed' => true]);
 }

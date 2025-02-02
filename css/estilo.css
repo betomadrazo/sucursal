@@ -7,9 +7,6 @@ body {
   background-color: #142;
 }
 
-.fondo {
-}
-
 .conti {
   width: 75%;
   padding: 20px;
@@ -39,6 +36,22 @@ body {
 .contenedor-cola {
   overflow: scroll;
   overflow-x: hidden;
+}
+
+.contenedor-cola li {
+  position: relative;
+}
+
+.contenedor-cola li:nth-of-type(1)::before {
+  position: absolute;
+  content: " ";
+  width: 0;
+  height: 0;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  margin-left: 5px;
+  margin-right: 5px;
+  border-left: 8px solid #000;
 }
 
 #rocola {
@@ -206,23 +219,80 @@ body {
 }
 
 .actualizando {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
+  display: none;
+  /* Hidden by default */
+  position: fixed;
+  /* Stay in place */
+  z-index: 1;
+  /* Sit on top */
   left: 0;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0, 0, 0); /* Fallback color */
-  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+  width: 100%;
+  /* Full width */
+  height: 100%;
+  /* Full height */
+  overflow: auto;
+  /* Enable scroll if needed */
+  background-color: rgb(0, 0, 0);
+  /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.4);
+  /* Black w/ opacity */
 }
 
 .actualizando_cont {
   background-color: #fefefe;
-  margin: 15% auto; /* 15% from the top and centered */
+  margin: 15% auto;
+  /* 15% from the top and centered */
   padding: 20px;
   border: 1px solid #888;
   text-align: center;
-  width: 50%; /* Could be more or less, depending on screen size */
+  width: 50%;
+  /* Could be more or less, depending on screen size */
+}
+
+.detail-mask {
+  position: fixed;
+  z-index: 9998;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: gray;
+  display: table;
+}
+
+.auth-contenedor {
+  background-color: gray;
+  width: 100%;
+  height: 100%;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.auth-form {
+  background-color: black;
+  width: 500px;
+  border-radius: 5px;
+  color: #fff;
+  text-align: center;
+  margin: auto;
+  padding: 20px;
+  width: 300px;
+  box-shadow: 2px 5px 20px #000;
+}
+
+.auth-form input {
+  display: block;
+  margin: auto;
+  margin: 10px auto 10px auto;
+  font-size: 20px;
+  padding: 5px;
+  max-width: 80%;
+}
+
+.auth-form input[type="submit"] {
+  background-color: orange;
+  border-radius: 5px;
+  border: none;
+  width: 80%;
 }

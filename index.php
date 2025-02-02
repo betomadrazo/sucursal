@@ -2,29 +2,23 @@
 
 session_start();
 
-?>
-
-<!DOCTYPE html>
-
-<?php
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
+require "config.php";
 
 if (isset($_GET['usuario'])) {
     $_SESSION['usuario'] = $_GET['usuario'];
 }
 
-// $DEBUG = false;
-
-// This could cause problems when using another port
 if (!isset($_SESSION['usuario'])) {
-    // echo "_______>>>>>>>>>>>>>>>> " . urlencode($_SERVER['REQUEST_URI']);
-    header("Location: /sucursal/auth.php?sitio=" . urlencode("http://localhost:1010/sucursal/index.php")); //urlencode($_SERVER['REQUEST_URI']));
+    header("Location: /sucursal/auth.php?sitio=" . urlencode($local_url));
+    exit();
 }
 
 ?>
 
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -39,10 +33,10 @@ if (!isset($_SESSION['usuario'])) {
 
 <body>
 
-    <input 
-        type="hidden" 
-        id="sucursal_id" 
-        value="<?php 
+    <input
+        type="hidden"
+        id="sucursal_id"
+        value="<?php
             if (isset($_SESSION['sucursal_id'])) echo $_SESSION['sucursal_id'];
             else echo ''; ?>"/>
 
@@ -86,6 +80,5 @@ if (!isset($_SESSION['usuario'])) {
     <script src="js/sucursal.js"></script>
     <script src="js/player.js"></script>
 </body>
-
 
 </html>

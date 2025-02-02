@@ -6,12 +6,10 @@ services:
       - "1010:80"
     volumes:
       - ./:/var/www/html/sucursal
-      - ../consola/album_artwork:/var/www/html/sucursal/album_artwork
-      - ../consola/artist_photo:/var/www/html/sucursal/artist_photo
-      - ../consola/img:/var/www/html/sucursal/img
-      - ../consola/musica:/var/www/html/sucursal/musica
-      - ../consola/aleatorias_manana:/var/www/html/sucursal/aleatorias_manana
-      - ../consola/aleatorias_tarde:/var/www/html/sucursal/aleatorias_tarde
+      - ../artist_photo:/var/www/html/sucursal/artist_photo
+      - ../musica:/var/www/html/sucursal/musica
+      - ../aleatorias_manana:/var/www/html/sucursal/aleatorias_manana
+      - ../aleatorias_tarde:/var/www/html/sucursal/aleatorias_tarde
     depends_on:
       - dbsucursal
     networks:
