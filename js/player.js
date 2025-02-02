@@ -1,4 +1,5 @@
 $(function() {
+    console.log("1");
   var nombreSucursal;
   console.log("id sucursal: ", sucursalId);
 
@@ -27,10 +28,12 @@ $(function() {
     case 17:
       nombreSucursal = "San Ángel";
       break;
-    case 20:
+    default:
       nombreSucursal = "PRUEBAS";
       break;
   }
+
+  console.log("2, NOMBRE SUCURSAL: ", nombreSucursal);
 
   $(".nombre_sucursal")
     .html(nombreSucursal)
@@ -49,11 +52,6 @@ $(function() {
   var tiempoRestante;
 
   var url_local = "backend/local.php";
-
-  var fakeSongs = {
-    coleccion: "coleccion x",
-    canciones: []
-  };
 
   function getQueue() {
     $.ajax({
@@ -246,8 +244,8 @@ $(function() {
       altRow = "alt-row";
     }
     return `<li class="cancion ${altRow}" data-cancion_id="${info.id}" data-path="${info.path}">
-				<span>${info.titulo}</span><span>${info.artista}</span><span>${info.duracion}</span>
-			</li>`;
+                <span>${info.titulo}</span><span>${info.artista}</span><span>${info.duracion}</span>
+            </li>`;
   }
 
   function checkQueueStatus() {
@@ -272,6 +270,7 @@ $(function() {
   // AQUÍ INICIA TODO
 
   window.onload = function() {
+    console.log("3, ONLOAD");
     // Check if there is player window open
     if (localStorage.playerIsOpen == "true") {
       $(".actualizando").css({ display: "block" });
@@ -290,10 +289,10 @@ $(function() {
     localStorage.playerIsOpen = "false";
   });
 
-  window.onunload = function(e) {
-    e.preventDefault();
-    localStorage.playerIsOpen = "false";
-  };
+//   window.onunload = function(e) {
+//     e.preventDefault();
+//     localStorage.playerIsOpen = "false";
+//   };
 
   $("#actualiza-catalogo").on("click", function() {
     if (confirm("¿Actualizar el catálogo?")) {
@@ -374,4 +373,5 @@ $(function() {
       .css("border", "1px solid")
       .remove();
   });
+  console.log("2");
 });
