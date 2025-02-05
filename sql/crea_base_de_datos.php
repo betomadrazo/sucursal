@@ -8,20 +8,7 @@ ini_set('display_errors', '1');
 require "../secrets.php";
 
 require "../backend/local.php";
-
-$database = "rocola";
-
-$retries = 5;
-$connected = false;
-while ($retries > 0 && !$connected) {
-    $conn = @new \mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database);
-    if ($conn->connect_error) {
-        $retries--;
-        sleep(1);
-    } else {
-        $connected = true;
-    }
-}
+require "../db_connection.php";
 
 mysqli_autocommit($conn, FALSE);
 

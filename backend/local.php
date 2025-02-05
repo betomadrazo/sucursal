@@ -1,9 +1,7 @@
 <?php
 
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
@@ -42,6 +40,9 @@ if (isset($_GET['accion'])) {
             echo json_encode(['msg' => 'No hay cola']);
         }
         exit();
+    }
+    if ($action === 'get_song_from_id') {
+        echo json_encode(getSongFromId($_GET['id']));
     }
 }
 
@@ -206,7 +207,7 @@ function getRandomSong()
 
     if ($r && mysqli_num_rows($r)) {
         $random_song_id = mysqli_fetch_row($r)[0];
-        return json_encode([$random_song_id]);
+        return $random_song_id;
     }
 
     // Si se agotaron las canciones del turno, repite alguna canción
@@ -217,7 +218,7 @@ function getRandomSong()
 
     if ($r && mysqli_num_rows($r)) {
         $random_song_id = mysqli_fetch_row($r)[0];
-        return json_encode([$random_song_id]);
+        return $random_song_id;
     }
 
     $q = "SELECT id FROM canciones_local ORDER BY RAND() LIMIT 1";
@@ -225,11 +226,10 @@ function getRandomSong()
     $r = mysqli_query($conn, $q);
 
     if ($r && mysqli_num_rows($r)) {
-        $random_song_id = mysqli_fetch_row($r)[0];
-        return json_encode([$random_song_id]);
+        return mysqli_fetch_row($r)[0];
     }
 
-    return [42];
+    return 42;
 }
 
 function getHora()
@@ -312,3 +312,28 @@ function pushPanicButton($id_sucursal)
 
     return json_encode(['processed' => true]);
 }
+
+function getSongFromId($id) {
+    global $conn, $url;
+
+    $q = "SELECT * FROM canciones_local WHERE id=$id LIMIT 1";
+    $res = mysqli_query($conn, $q);
+    if ($res && mysqli_num_rows($res)) {
+        return mysqli_fetch_assoc($res);
+    }
+    return null;
+}
+
+// $canciones = [];
+// if (mysqli_num_rows($res)) {
+//     while ($row = mysqli_fetch_assoc($res)) {
+//         $cancion = [
+//             'id' => $row['id'],
+//             'titulo' => ($row['titulo']),
+//             'duracion' => $row['duracion'],
+//             'path' => ($row['song_path']),
+//             'artista' => ($row['artista'])
+//         ];
+//         array_push($canciones, $cancion);
+//     }
+// }

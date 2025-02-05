@@ -6,6 +6,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 require "config.php";
+require "db_connection.php";
 
 if (isset($_GET['usuario'])) {
     $_SESSION['usuario'] = $_GET['usuario'];
@@ -14,6 +15,15 @@ if (isset($_GET['usuario'])) {
 if (!isset($_SESSION['usuario'])) {
     header("Location: /sucursal/auth.php?sitio=" . urlencode($local_url));
     exit();
+}
+
+if ($conn) {
+    $q ="SELECT COUNT(*) AS tablas FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'rocola'";
+    $res = mysqli_query($conn, $q);
+
+    if (!!!mysqli_fetch_assoc($res)['tablas']) {
+        header("Location: sql/crea_base_de_datos.php");
+    }
 }
 
 ?>

@@ -1,4 +1,4 @@
-$(function() {
+$(function () {
   var nombreSucursal;
   console.log("id sucursal: ", sucursalId);
 
@@ -32,7 +32,6 @@ $(function() {
       break;
   }
 
-
   $(".nombre_sucursal")
     .html(nombreSucursal)
     .css({ display: "inline-block", margin: "0", float: "left" });
@@ -59,9 +58,9 @@ $(function() {
       crossDomain: true,
       data: {
         accion: "get_queue",
-        sucursal_id: sucursalId
+        sucursal_id: sucursalId,
       },
-      success: function(queue) {
+      success: function (queue) {
         if (queue.length) {
           if (queue[0] === idCurrentSong) {
             queue.shift();
@@ -71,9 +70,9 @@ $(function() {
           playRandomSong();
         }
       },
-      error: function(e, a) {
+      error: function (e, a) {
         playRandomSong();
-      }
+      },
     });
   }
 
@@ -85,10 +84,11 @@ $(function() {
       crossDomain: true,
       data: {
         accion: "get_songs_in_queue",
-        songs: queue
+        songs: queue,
       },
-      success: function(songs) {
+      success: function (songs) {
         if (songs.length) {
+          console.log("SONGS: ", songs, songs.length);
           // traer la info de la canción de la db local
           for (var s of songs) {
             cola.push(s);
@@ -98,32 +98,53 @@ $(function() {
           playSong(cola[0], cola[0].id);
         } else {
           playRandomSong();
-          console.log("No hay canciones en cola; poniendo una canción aleatoria.");
+          console.log(
+            "No hay canciones en cola; poniendo una canción aleatoria."
+          );
         }
       },
-      error: function(response, c) {
+      error: function (response, c) {
         console.log(response, c);
-      }
+      },
     });
   }
 
-  function playRandomSong() {
-    $.ajax({
-      url: url_local,
-      type: "GET",
-      dataType: "json",
-      data: {
-        accion: "get_random_song"
-      },
-      success: function(response) {
-        if (response.length) {
-          getSongsInQueue(response);
-        }
-      },
-      error: function(response, p) {
-        console.log(response, p);
+  async function playRandomSong() {
+    try {
+      const response = await fetch(`${url_local}?accion=get_random_song`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "appliction/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Error: ", response.status);
       }
-    });
+
+      const data = await response.json();
+
+      console.log(`${url_local}?accion=get_song_from_id&id=${data}`);
+      const randomSongData = await fetch(
+        `${url_local}?accion=get_song_from_id&id=${data}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!randomSongData.ok) {
+        throw new Error("Error: ", response.status);
+      }
+
+      const songData = await randomSongData.json();
+
+      fillWithSongs([songData], "queue");
+    } catch (error) {
+      console.log("Error: ", error);
+    }
   }
 
   function fillWithSongs(songs, lista) {
@@ -151,8 +172,8 @@ $(function() {
       data: {
         accion: "remove_from_queue",
         sucursal_id: sucursalId,
-        song_id: songId
-      }
+        song_id: songId,
+      },
     });
   }
 
@@ -162,29 +183,29 @@ $(function() {
     var segundosParaRefrescarStatus = 3;
     audio.src = cancion.path;
     audio.load();
-    setTimeout(function() {
+    setTimeout(function () {
       audio.play();
     }, 150);
 
     removeSongFromQueue(id);
 
-    audio.onloadedmetadata = function() {
+    audio.onloadedmetadata = function () {
       var duracion = Math.floor(audio.duration);
       var timero = document.getElementById("tiempo-restante");
 
       // Envía el estatus de la canción que ahora suena
       postSongStatus(cancion.id, cancion.titulo, cancion.artista, {
         duracion: audio.duration,
-        currentTime: audio.currentTime
+        currentTime: audio.currentTime,
       });
 
       var segundosTranscurridos = 0;
 
-      tiempoRestante = setInterval(function() {
+      tiempoRestante = setInterval(function () {
         if (segundosTranscurridos > segundosParaRefrescarStatus) {
           postSongStatus(cancion.id, cancion.titulo, cancion.artista, {
             duracion: audio.duration,
-            currentTime: audio.currentTime
+            currentTime: audio.currentTime,
           });
 
           // resetea el conteo para enviar info
@@ -215,9 +236,9 @@ $(function() {
         artista: artista,
         tiempo: {
           duracion: tiempo.duracion,
-          tiempo_transcurrido: tiempo.currentTime
-        }
-      }
+          tiempo_transcurrido: tiempo.currentTime,
+        },
+      },
     });
   }
 
@@ -230,8 +251,8 @@ $(function() {
       data: {
         accion: "update_last_played",
         cancion_id: cancionId,
-        sucursal_id: sucursalId
-      }
+        sucursal_id: sucursalId,
+      },
     });
   }
 
@@ -253,50 +274,50 @@ $(function() {
       crossDomain: true,
       data: {
         accion: "update_status_canciones_pedidas",
-        sucursal_id: sucursalId
+        sucursal_id: sucursalId,
       },
-      success: function(response) {
+      success: function (response) {
         console.log("=> ", response);
       },
-      error: function(error, err) {
+      error: function (error, err) {
         console.log("ERROR: " + JSON.stringify(error), "ERR: " + err);
-      }
+      },
     });
   }
 
   // AQUÍ INICIA TODO
 
-    window.onload = init();
+  window.onload = init();
 
-    function init () {
-        if (localStorage.playerIsOpen == "true") {
-          $(".actualizando").css({ display: "block" });
-          $(".actualizando_mensaje").html("Hay otro reproductor abierto.");
-        } else {
-          setInterval(function () {
-            localStorage.playerIsOpen = "true";
-          }, 1000);
-          checkQueueStatus();
-          getQueue();
-        }
+  function init() {
+    if (localStorage.playerIsOpen == "true") {
+      $(".actualizando").css({ display: "block" });
+      $(".actualizando_mensaje").html("Hay otro reproductor abierto.");
+    } else {
+      setInterval(function () {
+        localStorage.playerIsOpen = "true";
+      }, 1000);
+      checkQueueStatus();
+      getQueue();
     }
+  }
 
-window.addEventListener("beforeunload", function(e) {
-  localStorage.playerIsOpen = "false";
-});
+  window.addEventListener("beforeunload", function (e) {
+    localStorage.playerIsOpen = "false";
+  });
 
-window.onunload = function(e) {
-  e.preventDefault();
-  localStorage.playerIsOpen = "false";
-};
+  window.onunload = function (e) {
+    e.preventDefault();
+    localStorage.playerIsOpen = "false";
+  };
 
-  $("#actualiza-catalogo").on("click", function() {
+  $("#actualiza-catalogo").on("click", function () {
     if (confirm("¿Actualizar el catálogo?")) {
       actualizaCatalogo();
     }
   });
 
-  $("#panic").on("click", function() {
+  $("#panic").on("click", function () {
     if (confirm("Reiniciar el reproductor?")) {
       pushPanicButton();
     }
@@ -310,16 +331,16 @@ window.onunload = function(e) {
       dataType: "json",
       // crossDomain: true,
       data: {
-        accion: "update_db"
+        accion: "update_db",
       },
-      success: function(response) {
+      success: function (response) {
         location.reload(true);
       },
-      error: function(error, dd) {
+      error: function (error, dd) {
         console.log(error, dd);
         $(".actualizando").css({ display: "none" });
         alert("Error al actualizar");
-      }
+      },
     });
   }
 
@@ -332,18 +353,18 @@ window.onunload = function(e) {
         accion: "panic_button",
         id_sucursal: sucursalId,
       },
-      success: function(response) {
+      success: function (response) {
         console.log(response);
         location.reload(true);
       },
-      error: function(error, dd) {
+      error: function (error, dd) {
         console.log("Error: ", error, dd);
-      }
+      },
     });
   }
 
   // La canción termina
-  audio.addEventListener("ended", function() {
+  audio.addEventListener("ended", function () {
     // Envía la hora en que se tocó
     playedAt(cola[0].id);
 
@@ -364,9 +385,6 @@ window.onunload = function(e) {
       getQueue();
     }
 
-    $("#cola")
-      .find("li:first")
-      .css("border", "1px solid")
-      .remove();
+    $("#cola").find("li:first").css("border", "1px solid").remove();
   });
 });
