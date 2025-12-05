@@ -7,6 +7,7 @@
 // Zona Rosa:  15
 // Roma:       16
 // San Ángel:  17
+// Del Valle   18
 // Pruebas:    20
 
 const sucursalId = 20;
