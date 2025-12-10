@@ -1,5 +1,4 @@
 $(function () {
-  var nombreSucursal;
   console.log("id sucursal: ", sucursalId);
 
   const sucursales = {
