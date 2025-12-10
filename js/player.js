@@ -2,35 +2,18 @@ $(function () {
   var nombreSucursal;
   console.log("id sucursal: ", sucursalId);
 
-  switch (parseInt(sucursalId)) {
-    case 10:
-      nombreSucursal = "Corporativo";
-      break;
-    case 11:
-      nombreSucursal = "Condesa";
-      break;
-    case 12:
-      nombreSucursal = "Polanco";
-      break;
-    case 13:
-      nombreSucursal = "Santa Fé";
-      break;
-    case 14:
-      nombreSucursal = "Perisur";
-      break;
-    case 15:
-      nombreSucursal = "Zona Rosa";
-      break;
-    case 16:
-      nombreSucursal = "Roma";
-      break;
-    case 17:
-      nombreSucursal = "San Ángel";
-      break;
-    default:
-      nombreSucursal = "PRUEBAS";
-      break;
-  }
+  const sucursales = {
+    10: "Corporativo",
+    11: "Condesa",
+    12: "Polanco",
+    13: "Santa Fe",
+    14: "Perisur",
+    15: "Zona Rosa",
+    16: "Roma",
+    17: "San Ángel",
+    18: "Del Valle",
+  };
+  const nombreSucursal = sucursales[parseInt(sucursalId)] || "PRUEBAS";
 
   $(".nombre_sucursal")
     .html(nombreSucursal)
