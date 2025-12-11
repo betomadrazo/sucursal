@@ -86,7 +86,7 @@ if ($conn) {
     </div>
 
     <script src="js/jquery.js"></script>
-    <script src="js/sucursal.js"></script>
+    <script src="./config.js"></script>
     <script src="js/player.js"></script>
 </body>
 

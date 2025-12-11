@@ -5,7 +5,7 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-require "../secrets.php";
+require "../config.php";
 
 require "../backend/local.php";
 require "../db_connection.php";

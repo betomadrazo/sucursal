@@ -7,21 +7,16 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
 header('Content-Type: application/json; charset=utf-8');
 
-include "../secrets.php";
+include "../config.php";
 
-// $DEBUG = false;
-$database = 'rocola';
-$conn = new mysqli($secrets['host'], $secrets['user'], $secrets['password'], $database) or die("no se pudo conectar.");
+$conn = new mysqli(
+    $db_config['host'],
+    $db_config['user'],
+    $db_config['password'],
+    $db_config['database']
+) or die("no se pudo conectar.");
 
-// $web_server = 'rocola.pendulo.com.mx';
-// $server = ($DEBUG) ? $_SERVER['SERVER_NAME'] : $web_server;
-// $protocolo = $DEBUG ? 'http://' : 'https://';
-// $url = $protocolo . $server . '/consola/controllers/controller_musica.php';
-
-$protocolo = 'http://';
-$web_server = '172.17.0.1:8080';
-$server = $web_server;
-$url = "{$protocolo}{$server}/consola/controllers/controller_musica.php";
+$url = $server_url;
 
 
 if (isset($_GET['accion'])) {
@@ -91,7 +86,10 @@ function updateLocalDB()
     $result = fetchFromServer('get_colecciones_para_sucursales');
 
     // Obtiene la base de datos en formato json
-    updateColeccionesLocal($result['colecciones'], $result['canciones_coleccionadas']);
+    print_r($result);
+    if ($result !== null) {
+        updateColeccionesLocal($result['colecciones'], $result['canciones_coleccionadas']);
+    }
 }
 
 function fetchFromServer($endpoint)
