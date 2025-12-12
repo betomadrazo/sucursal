@@ -3,7 +3,7 @@ $(function() {
     $('#formulario_auth').submit(function(event) {
         event.preventDefault();
 
-        var formulario = $(this).serialize();
+        const formulario = $(this).serialize();
 
         $.ajax({
             url: url,

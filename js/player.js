@@ -319,7 +319,8 @@ $(function () {
         location.reload(true);
       },
       error: function (error, dd) {
-        console.log(error, dd);
+        console.log(error);
+        console.log(dd);
         $(".actualizando").css({ display: "none" });
         alert("Error al actualizar");
       },
@@ -340,7 +341,8 @@ $(function () {
         location.reload(true);
       },
       error: function (error, dd) {
-        console.log("Error: ", error, dd);
+        console.log("Error: ", error);
+        console.log(dd);
       },
     });
   }

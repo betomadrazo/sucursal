@@ -86,7 +86,6 @@ function updateLocalDB()
     $result = fetchFromServer('get_colecciones_para_sucursales');
 
     // Obtiene la base de datos en formato json
-    print_r($result);
     if ($result !== null) {
         updateColeccionesLocal($result['colecciones'], $result['canciones_coleccionadas']);
     }
