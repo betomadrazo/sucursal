@@ -29,6 +29,7 @@ $(function () {
   var idCurrentSong = 0;
 
   var tiempoRestante;
+  var elapsedTime;
 
   var url_local = "backend/local.php";
 
@@ -183,24 +184,36 @@ $(function () {
 
       var segundosTranscurridos = 0;
 
-      tiempoRestante = setInterval(function () {
-        if (segundosTranscurridos > segundosParaRefrescarStatus) {
-          postSongStatus(cancion.id, cancion.titulo, cancion.artista, {
-            duracion: audio.duration,
-            currentTime: audio.currentTime,
-          });
+      function scheduleStatusCheck() {
+        tiempoRestante = setTimeout(function () {
+          segundosTranscurridos++;
 
-          // resetea el conteo para enviar info
-          segundosTranscurridos = 0;
-        }
+          if (segundosTranscurridos > segundosParaRefrescarStatus) {
+            postSongStatus(cancion.id, cancion.titulo, cancion.artista, {
+              duracion: audio.duration,
+              currentTime: audio.currentTime,
+            });
+            segundosTranscurridos = 0;
+          }
 
-        var tiempo = new Date(null);
-        tiempo.setSeconds(audio.duration - audio.currentTime);
-        var falta = tiempo.toISOString().substr(11, 8);
-        timero.innerHTML = falta;
+          scheduleStatusCheck();
+        }, 1000 + Math.random() * 2000);
+      }
 
-        segundosTranscurridos++;
-      }, 1000);
+      scheduleStatusCheck();
+
+      function scheduleDisplayUpdate() {
+        elapsedTime = setTimeout(function () {
+          let tiempo = new Date(null);
+          tiempo.setSeconds(audio.duration - audio.currentTime);
+          let falta = tiempo.toISOString().substr(11, 8);
+          timero.innerHTML = falta;
+
+          scheduleDisplayUpdate();
+        }, 1000);
+      }
+
+      scheduleDisplayUpdate();
     };
   }
 
@@ -354,6 +367,7 @@ $(function () {
 
     checkQueueStatus();
     clearInterval(tiempoRestante);
+    clearInterval(elapsedTime);
     // si hay elementos en cola
     if (cola.length) {
       // obtenemos el id de la canción
@@ -372,3 +386,10 @@ $(function () {
     $("#cola").find("li:first").css("border", "1px solid").remove();
   });
 });
+
+const variableInterval = (baseMilliseconds) => {
+  console.log("fck");
+  const ninetyPercent = (baseMilliseconds * 90) / 100;
+  const tenPercent = (baseMilliseconds * 10) / 100;
+  return ninetyPercent + Math.floor(Math.random() * tenPercent);
+};
